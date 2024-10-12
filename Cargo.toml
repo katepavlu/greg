@@ -4,4 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-logos = "0.14.2"
+lexgen = "0.15.0"
+lexgen_util = "0.15.0"
