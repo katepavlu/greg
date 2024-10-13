@@ -1,3 +1,4 @@
 /target
 *.instr
 *.data
+.vscode/
