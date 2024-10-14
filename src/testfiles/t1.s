@@ -5,6 +5,8 @@
 
 .text
     la $t1, display
+    la $t2, constant
+    la $s1, buffer
     addi $t0, $zero, 7 #initialize t0
     loop_start:
         beq $t0, $zero, loop_end
