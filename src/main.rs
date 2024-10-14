@@ -405,7 +405,7 @@ fn main() {
 
         }
 
-        println!("{:#?}",instruction); // debug: print instruction
+        //println!("{:#?}",instruction); // debug: print instruction
 
         let mut bin_instr:u32 = 0; // assemble instruction 
 
