@@ -22,8 +22,7 @@ struct MachineInstruction {
     address: u32,
 }
 
-const DATA_ADDRESS_OFFSET:u32 = 0x10000000;
-const TEXT_ADDRESS_OFFSET:u32 = 0x00000000;
+
 
 
 fn main() {
@@ -114,7 +113,7 @@ fn main() {
     }
 
 
-    myio::print_to_file(&(output_file.clone() + ".data"), data_segment_vector);
+    io::print_to_file(&(output_file.clone() + ".data"), data_segment_vector);
 
 
     address = TEXT_ADDRESS_OFFSET;
@@ -420,7 +419,7 @@ fn main() {
 
     }
 
-    myio::print_to_file(&(output_file.clone() + ".instr"), bin_instr_vector);
+    io::print_to_file(&(output_file.clone() + ".instr"), bin_instr_vector);
 
 
 }
