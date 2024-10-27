@@ -8,6 +8,8 @@ use std::fs;
 use std::process::exit;
 use std::collections::HashMap;
 
+pub use mylexer::*;
+
 #[derive(Debug)]
 struct MachineInstruction {
     op: Instr,
@@ -33,18 +35,22 @@ fn main() {
     let input_file = &args[1];
     let output_file = &args[2];
 
-    let input_file_contents = fs::read_to_string(input_file).expect("Error reading input file."); //read input file to a string
+    let input_file_contents = 
+        fs::read_to_string(input_file)
+        .expect("Error reading input file."); //read input file to a string
 
     let mut lexer
-    = Lexer::new(&input_file_contents); // create a lexer iterator thing to recognize tokens in the input
+        = Lexer::new(&input_file_contents); // create a lexer iterator thing to recognize tokens in the input
 
     let mut address; // this holds the address of the instruction you're currently working on
     let mut instr_identifier_map = HashMap::new(); // hash map for linking identifiers
     let mut mach_instr_vec = Vec::new(); // vector of instructions
+    let mut data_segment_vector = Vec::new(); // vector for binary data
+    let mut bin_instr_vector = Vec::new(); // vector for binary instruction
 
     // first, interpret the data segment
     // .data has to be the first token in the file
-    let mut token0 = lexer.next();
+    let mut token0: Option<Result<(Loc, Token, Loc), LexerError<Infallible>>> = lexer.next();
     match token0 {
         Some(Ok((_,Token::Block(Bl::Data),_))) => (),
         Some(Ok((_,_,_))) => {
@@ -60,7 +66,7 @@ fn main() {
 
     address = DATA_ADDRESS_OFFSET;
 
-    let mut data_segment_vector = Vec::new();
+
     let mut identifier = String::new();
 
     // looping over addresses in the data segment
@@ -108,7 +114,7 @@ fn main() {
     }
 
 
-    print_to_file(&(output_file.clone() + ".data"), data_segment_vector);
+    myio::print_to_file(&(output_file.clone() + ".data"), data_segment_vector);
 
 
     address = TEXT_ADDRESS_OFFSET;
@@ -344,7 +350,6 @@ fn main() {
         
     }
 
-    let mut bin_instr_vector = Vec::new();
     // loop over collected instructions
     for mut instruction in mach_instr_vec {
 
@@ -415,7 +420,7 @@ fn main() {
 
     }
 
-    print_to_file(&(output_file.clone() + ".instr"), bin_instr_vector);
+    myio::print_to_file(&(output_file.clone() + ".instr"), bin_instr_vector);
 
 
 }

@@ -1,52 +1,9 @@
 use lexgen::lexer;
-
-/// # Token types
-/// 
-/// #TODO explain what Err does
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Token {
-    Comma,
-    Colon,
-    Instruction(Instr),
-    Register(u8),
-    Identifier(String),
-    Immediate(i64),
-    Block(Bl),
-    Err,
-}
-
-/// # Block annotations
-/// 
-/// Data - starts data block
-/// 
-/// Text - starts text block
-/// 
-/// Addr - selects direct memory access (used for memory mapped peripherals)
-/// 
-/// Space - selects contigous space of n words (zeroed)
-/// 
-/// Word - selects one initialised word
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Bl {
-    Data,
-    Text,
-    Addr,
-    Space,
-    Word,
-}
-
-/// # Instructions
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Instr {
-    And, Or, Xor, Not,
-    Add, Sub, Cmp,
-    J, Beq, Bne,
-    Sl, Sr,
-    Addi, Lui,
-    Lw, Sw,
-
-    La, Ja,
-}
+use crate::{
+    Token,
+    Bl,
+    Instr
+};
 
 lexer! {
     ///
