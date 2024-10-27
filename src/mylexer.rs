@@ -303,14 +303,4 @@ mod tests {
 
     }
 
-        
-
-    /*    #[test]
-    fn lex_asm_comments() {
-        let mut lexer
-        = Lexer::new("#addi $t0, $zero, -256\n #addi $t0, $zero, -256\n #string\n #123465");
-        assert_eq!( ignore_pos(lexer.next()), None);
-    }
-    */
-
 }
