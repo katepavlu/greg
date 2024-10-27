@@ -292,14 +292,10 @@ mod tests {
                 =  l
             {} else {panic!("String {string} not recognized as invalid. {:#?}",l);}
         }
+    }
 
-        let valid_strings = ["add1", "addiu", "$t1"];
-        for string in valid_strings {
-            if let 
-            Err(LexerError{location:_, kind: _}) 
-            = Lexer::new(string).next().unwrap() 
-            {panic!("String {string} recognized as invalid.");}
-        }
+    #[test]
+    fn identifier() {
 
     }
 
