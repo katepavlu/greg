@@ -296,7 +296,15 @@ mod tests {
 
     #[test]
     fn identifier() {
+        let input = "add1 addiu janky snake_case CamelCase";
+        let mut lexer = Lexer::new(input);
 
+        assert_eq!(get_value(lexer.next()), Token::Identifier("add1".to_string()));
+        assert_eq!(get_value(lexer.next()), Token::Identifier("addiu".to_string()));
+        assert_eq!(get_value(lexer.next()), Token::Identifier("janky".to_string()));
+        assert_eq!(get_value(lexer.next()), Token::Identifier("snake_case".to_string()));
+        assert_eq!(get_value(lexer.next()), Token::Identifier("CamelCase".to_string()));
+        assert_eq!(lexer.next(), None);
     }
 
 }
