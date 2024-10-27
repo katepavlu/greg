@@ -381,14 +381,17 @@ fn main() {
     // loop over collected instructions
     for mut instruction in mach_instr_vec {
 
-        // link identifiers
-        let target_address = 
-        match instr_identifier_map.get(&instruction.imm_identifier) {
-            None => 0,
-            Some(n)=> n.to_owned(),
-        };
-
         if instruction.imm_identifier.len() != 0 {
+
+            // link identifiers
+            let target_address = 
+                match instr_identifier_map.get(&instruction.imm_identifier) {
+                    None => {
+                        println!("Identifier not recognized: {}", instruction.imm_identifier);
+                        exit(1);
+                    },
+                    Some(n)=> n.to_owned(),
+                };
 
             match instruction.op {
                 Instr::Beq|Instr::Bne => { // beq, bne require an offset if they have an identifier
