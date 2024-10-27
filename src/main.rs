@@ -1,5 +1,5 @@
-pub mod asm_lex;
-use asm_lex::*;
+pub mod mylexer;
+use mylexer::*;
 use lexgen_util::LexerError;
 use lexgen_util::Loc;
 
