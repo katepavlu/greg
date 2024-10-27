@@ -1,5 +1,4 @@
-pub mod mylexer;
-use mylexer::*;
+use greg::*;
 use lexgen_util::LexerError;
 use lexgen_util::Loc;
 
@@ -8,10 +7,6 @@ use std::env;
 use std::fs;
 use std::process::exit;
 use std::collections::HashMap;
-
-use std::path::Path;
-use std::fs::File;
-use std::io::prelude::*;
 
 #[derive(Debug)]
 struct MachineInstruction {
@@ -47,8 +42,8 @@ fn main() {
     let mut instr_identifier_map = HashMap::new(); // hash map for linking identifiers
     let mut mach_instr_vec = Vec::new(); // vector of instructions
 
-    /* first, interpret the data segment */
-    /* .data has to be the first token in the file */
+    // first, interpret the data segment
+    // .data has to be the first token in the file
     let mut token0 = lexer.next();
     match token0 {
         Some(Ok((_,Token::Block(Bl::Data),_))) => (),
@@ -68,7 +63,7 @@ fn main() {
     let mut data_segment_vector = Vec::new();
     let mut identifier = String::new();
 
-    /* looping over addresses in the data segment */
+    // looping over addresses in the data segment
     loop {
         token0 = lexer.next();
 
@@ -113,31 +108,12 @@ fn main() {
     }
 
 
-    // create a file for the output (data)
-    let output_file_data = output_file.clone() + ".data";
-    let output_file_data = Path::new(&output_file_data);
-    let mut data_file = match File::create(&output_file_data) {
-        Err(why) => {println!("Couldn't create file: {}; {}", output_file_data.display(), why); exit(1)},
-        Ok(file) => file,
-    };
-
-    // save all the gatherred data to it
-    for num in data_segment_vector {
-        match data_file.write_all(&num.to_be_bytes()) {
-            Ok(_) => (),
-            Err(_)=> file_error(output_file_data),
-        }
-    }
-
-    match data_file.flush()  {
-        Ok(_) => (),
-        Err(_)=> file_error(output_file_data),
-    };
+    print_to_file(&(output_file.clone() + ".data"), data_segment_vector);
 
 
     address = TEXT_ADDRESS_OFFSET;
 
-    /* looping over instructions: first loop, interpretting */
+    // looping over instructions: first loop, interpretting
     loop {
         let mut mach_inst = 
             MachineInstruction{
@@ -151,7 +127,7 @@ fn main() {
 
         token0 = lexer.next(); // read a token
 
-        /* if the token is an identifier, register it to the next instruction */
+        // if the token is an identifier, register it to the next instruction
         match token0 {
             Some(Ok((_,Token::Identifier(str),_))) => {
 
@@ -165,12 +141,11 @@ fn main() {
             _ => (),
         }
 
-        /* if you find a : after an identifier, register its address to the hash map */
+        // if you find a : after an identifier, register its address to the hash map
 
-
-        /* if the token is an instruction, register the type and read the registers/immediate that it needs */
+        // if the token is an instruction, register the type and read the registers/immediate that it needs
         match token0 {
-            None => {println!("EOF reached"); break},
+            None => {println!("Success."); break},
             Some(Err(e)) => parse_err(e.location.line, e.location.col),
             Some(Ok((l,token,_))) => {
 
@@ -369,15 +344,7 @@ fn main() {
         
     }
 
-    // create a file for the output (instructions)
-    let output_file_instr = output_file.clone() + ".instr";
-    let output_file_instr = Path::new(&output_file_instr);
-    let mut instr_file = match File::create(&output_file_instr) {
-        Err(why) => {println!("Couldn't create file: {}; {}", output_file_instr.display(), why); exit(1)},
-        Ok(file) => file,
-    };
-
-
+    let mut bin_instr_vector = Vec::new();
     // loop over collected instructions
     for mut instruction in mach_instr_vec {
 
@@ -434,9 +401,7 @@ fn main() {
             Instr::Lw =>  0b1110,
             Instr::Sw =>  0b1111,
             _ => {
-                println!("Pseudoinstruction not handled. This is a bug. Exitting");
-                std::fs::remove_file(output_file_instr).expect("File deletion failed. Delete output file and try again.");
-                exit(1)
+                panic!("Pseudoinstruction not handled. This is a bug");
             },
         }) << 28;
         
@@ -446,17 +411,12 @@ fn main() {
 
         bin_instr |= instruction.imm as u32 & 0xFFFF; // add immediate
 
-        match instr_file.write_all(&bin_instr.to_be_bytes()) {
-            Ok(_) => (),
-            Err(_)=> file_error(output_file_instr),
-        };
+        bin_instr_vector.push(bin_instr);
 
     }
 
-    match instr_file.flush()  {
-        Ok(_) => (),
-        Err(_)=> file_error(output_file_instr),
-    };
+    print_to_file(&(output_file.clone() + ".instr"), bin_instr_vector);
+
 
 }
 
@@ -479,12 +439,6 @@ fn incomplete_instruction(line:u32, col:u32) {
 fn error_reading_number(line:u32, col:u32) {
     println!("Error reading numberL line {} character {}", line, col);
     exit(1);
-}
-
-fn file_error(file: &Path) {
-    println!("File write error: {}", file.display());
-    std::fs::remove_file(file).expect("File deletion failed. Delete output file and try again.");
-    exit(1)
 }
 
 fn read_token(input: Option<Result<(Loc, Token, Loc) , LexerError<Infallible>>>) -> (Loc,Token) {
