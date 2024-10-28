@@ -20,7 +20,7 @@ struct Loc{
 pub enum ParserError{
     CodeOutsideSegment,
     InvalidToken(Loc),
-    IncompleteInstruction(Loc),
+    Incomplete(Loc),
     End,
     Empty,
 }
@@ -31,7 +31,7 @@ impl std::fmt::Display for ParserError {
         match self {
             Self::CodeOutsideSegment => write!(f, "File must start with segment anotation!"),
             Self::InvalidToken(loc) => write!(f, "Invalid token: line {} column {}!", loc.row, loc.col),
-            Self::IncompleteInstruction(loc) => write!(f, "Incomplete instruction: line {} column {}!", loc.row, loc.col),
+            Self::Incomplete(loc) => write!(f, "Incomplete instruction/assignment: line {} column {}!", loc.row, loc.col),
             Self::End => write!(f, "End of input reached!"), 
             Self::Empty => write!(f, "No valid tokens found"),          
         }
@@ -112,26 +112,70 @@ fn read_token(ret: Option<LexerResult>) -> ParserResult {
 fn sel_token(ret: Option<LexerResult>, selection: Token) -> ParserResult {
     match read_token(ret)? {
         (loc, token) if token.type_id() == selection.type_id() => Ok((loc,token)),
-        (loc, _) => Err(ParserError::IncompleteInstruction(loc)),
+        (loc, _) => Err(ParserError::Incomplete(loc)),
+    }
+}
+
+/// # Get register
+/// 
+/// uses sel_token to read a register number. Forwards errors
+fn get_register(ret: Option<LexerResult>) -> Result<u8, ParserError> {
+    match sel_token(ret, Token::Register(0))? {
+        (_, Token::Register(x)) => Ok(x),
+        _ => panic!("getting register failed") // this should never happen
+    }
+}
+
+/// # Get immediate
+/// 
+/// uses sel_token to read an immediate. Forwards errors
+fn get_immediate(ret: Option<LexerResult>) -> Result<i64, ParserError> {
+    match sel_token(ret, Token::Immediate(0))? {
+        (_, Token::Immediate(x)) => Ok(x),
+        _ => panic!("getting immediate failed") // this should never happen
+    }
+}
+
+/// # Get identifier or immediate
+/// 
+/// uses sel_token to read an immediate. Forwards errors
+fn get_identifier_or_imm(ret: Option<LexerResult>)
+     -> Result<(String, i64), ParserError> 
+{
+    match read_token(ret)? {
+        (_, Token::Identifier(str)) => Ok((str, 0)),
+        (_, Token::Immediate(x)) => Ok((String::new(), x)),
+        (loc, _) => Err(ParserError::Incomplete(loc)),
     }
 }
 
 type Lexer<'a> = mylexer::Lexer_<'a, std::str::Chars<'a>, ()>;
-fn read_instruction(
-    instruction: Instr, ret: Lexer<'_>, &mut addr: &mut u32)
+fn get_instruction(
+    instruction: Instr, identifier: String, lexer:&mut Lexer<'_>, address: &mut u32 )
      -> Result<Vec<InstructionNode>, ParserError> 
 {
     let mut return_vector:Vec<InstructionNode> = Vec::new();
+    
+    let mut op = instruction;
+    let mut rd = 0;
+    let mut ra = 0;
+    let mut rb = 0;
+    let mut imm = 0;
+    let mut identifier = identifier;
+    let mut imm_identifier = String::new();
+    
+    match op {
+        Instr::And | Instr::Or | Instr::Xor | Instr::Add | Instr::Sub | Instr::Cmp => {
 
-    match instruction {
-        Instr::And => (),
-        Instr::Or => (),
-        Instr::Xor => (),
+            rd = get_register(lexer.next())?;
+            sel_token(lexer.next(), Token::Comma)?;
+            ra = get_register(lexer.next())?;
+            sel_token(lexer.next(), Token::Comma)?;
+            rb = get_register(lexer.next())?;
+
+
+        },
         Instr::Not => (),
-
-        Instr::Add => (),
-        Instr::Sub => (),
-        Instr::Cmp => (),
 
         Instr::J => (),
         Instr::Beq => (),
@@ -149,6 +193,13 @@ fn read_instruction(
         Instr::La => (),
         Instr::Ja => (),
     };
+
+    return_vector.push(
+        InstructionNode{
+            op, rd, ra, rb, imm, identifier, imm_identifier, address: *address
+        }
+    );
+    *address += 4;
 
     Ok(return_vector)
 }
