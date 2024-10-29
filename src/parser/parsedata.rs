@@ -2,7 +2,7 @@ use super::parsehelpers::*;
 use super::*;
 
 pub fn parse_data(
-    block: Bl, mut identifier: String, lexer:&mut Lexer<'_>, address: &mut u32 )
+    block: Bl, identifier: String, lexer:&mut Lexer<'_>, address: &mut u32 )
     -> Result<DataNode, ParserError> 
 {
     let mut data = 0;

@@ -10,7 +10,7 @@ use parseinstruction::*;
 mod parsedata;
 use parsedata::*;
 
-use super::mylexer;
+pub mod mylexer;
 
 use crate::types::*;
 

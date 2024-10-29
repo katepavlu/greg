@@ -1,7 +1,7 @@
 pub type LexerResult = Result<(lexgen_util::Loc, Token, lexgen_util::Loc), LexerError<Infallible>>;
 pub type Lexer<'a> = mylexer::Lexer_<'a, std::str::Chars<'a>, ()>;
 
-use crate::mylexer;
+use super::mylexer;
 use super::*;
 
 /// # Parse single token
@@ -77,7 +77,7 @@ pub fn get_identifier_or_imm(ret: Option<LexerResult>)
 
 #[cfg(test)]
 mod tests {
-    use crate::mylexer;
+    use super::mylexer;
     use super::*;
 
     #[test]

@@ -8,8 +8,6 @@ use std::fs;
 use std::process::exit;
 use std::collections::HashMap;
 
-pub use mylexer::*;
-
 #[derive(Debug)]
 struct MachineInstruction {
     op: Instr,
