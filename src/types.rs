@@ -37,6 +37,7 @@ pub enum Instr {
     La, Ja,
 }
 
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct InstructionNode {
     pub op: Instr,
     pub rd: u8,
@@ -48,13 +49,16 @@ pub struct InstructionNode {
     pub address: u32,
 }
 
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct DataNode {
     pub identifier: String,
     pub address: u32,
     pub block: Bl,
     pub data: i64,
+    pub num: u32,
 }
 
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ProgramTree {
     pub instructions: Vec<InstructionNode>,
     pub data: Vec<DataNode>,
