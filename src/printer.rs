@@ -2,7 +2,7 @@ use crate::ProgramTree;
 use crate::types::*;
 
 #[derive(Debug, PartialEq)]
-enum PrinterError{
+pub enum PrinterError{
     PseudoinstructionNotHandled(Instr),
     InvalidBlock(Bl),
 }
@@ -18,7 +18,7 @@ impl std::fmt::Display for PrinterError{
     }
 }
 
-fn print_binary(tree: ProgramTree) -> Result<ProgramBinary, PrinterError> {
+pub fn print_binary(tree: ProgramTree) -> Result<ProgramBinary, PrinterError> {
 
     let mut binary = ProgramBinary{
         data: Vec::new(),

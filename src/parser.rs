@@ -23,8 +23,8 @@ type ParserResult = Result<(Loc, Token), ParserError>;
 /// indicates where in the file a token/error was encountered
 #[derive(Debug, PartialEq)]
 pub struct Loc{
-    row:u32,
-    col:u32
+    pub row:u32,
+    pub col:u32
 }
 
 /// # Parse error type
