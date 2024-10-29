@@ -6,7 +6,6 @@ use crate::{
 };
 
 lexer! {
-    ///
     pub Lexer -> Token;
 
     let whitespace = [' ' '\t' '\n'] | "\r\n";

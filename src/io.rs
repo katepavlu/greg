@@ -5,7 +5,7 @@ use std::{
     process
 };
 
-/// # Print a binary buffer to a file specified in filename
+/// Print a binary (u32) buffer to a file specified in filename
 pub fn print_to_file(filename:&str, buffer:Vec<u32>) {
     // create a file for the output (data)
     let file_path = Path::new(&filename);
@@ -30,7 +30,8 @@ pub fn print_to_file(filename:&str, buffer:Vec<u32>) {
     };
 }
 
-fn file_cleanup(file: &Path) {
+/// cleanup after an io error: delete the created file or display a message if unable
+fn file_cleanup(file: &Path)-> ! {
     eprintln!("File write error: {}", file.display());
     std::fs::remove_file(file).expect("File deletion failed. Delete output file and try again.");
     process::exit(1);

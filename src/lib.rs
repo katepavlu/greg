@@ -1,25 +1,30 @@
+/// static variable memory addresses start here
 pub const DATA_ADDRESS_OFFSET:u32 = 0x10000000;
+
+/// instruction memory addresses start here
 pub const TEXT_ADDRESS_OFFSET:u32 = 0x00000000;
 
+/// handles printing out files
 pub mod io;
 
 mod types;
 pub use types::*;
 
+/// handles parsing and lexing the program listing
 pub mod parser;
 pub use parser::ParserError;
 
+/// handles linking the various .data and .text segments together
 pub mod linker;
 pub use linker::LinkerError;
 
+/// handles converting the abstract program representation to binary data
 pub mod printer;
-pub use printer::PrinterError;
 
 #[derive(Debug, PartialEq)]
 pub enum AssemblerError {
     ParserError(ParserError),
     LinkerError(LinkerError),
-    PrinterError(PrinterError),
 }
 
 impl std::fmt::Display for AssemblerError {
@@ -27,11 +32,18 @@ impl std::fmt::Display for AssemblerError {
         match self {
             Self::ParserError(e) => write!(f, "Error: {e}"),
             Self::LinkerError(e) => write!(f, "Error: {e}"),
-            Self::PrinterError(e) => write!(f, "Error: {e}"),
         }
     }
 }
 
+/// main function of the library - takes in a program listing, outputs a binary
+/// 
+/// The program listing should be all the files of the program concatenated together,
+/// starting with the main function.
+/// 
+/// # Panics:
+/// 
+/// Should only panic if there is a bug.
 pub fn assemble(listing: &str) -> Result<ProgramBinary, AssemblerError> {
 
     let mut tree = match parser::parse(&listing) {
@@ -44,10 +56,7 @@ pub fn assemble(listing: &str) -> Result<ProgramBinary, AssemblerError> {
         Err(e) => return Err(AssemblerError::LinkerError(e)),
     };
 
-    let binary = match printer::print_binary(tree) {
-        Ok(bin) => bin,
-        Err(e) => return Err(AssemblerError::PrinterError(e)),
-    };
+    let binary = printer::print_binary(tree);
 
     Ok(binary)
 }

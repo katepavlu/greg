@@ -1,11 +1,14 @@
-use super::parsehelpers::*;
+use super::parserhelpers::*;
 use super::*;
 
+/// given an instruction identifier, parse the rest of the instruction and return the node
+/// 
+/// returns a vector of nodes, since some instructions are in reality composed of several others
 pub fn parse_instruction(
     instruction: Instr, mut identifier: String, lexer:&mut Lexer<'_>, address: &mut u32 )
      -> Result<Vec<InstructionNode>, ParserError> 
 {
-    let mut return_vector:Vec<InstructionNode> = Vec::new();
+    let mut return_vector:Vec<InstructionNode> = Vec::new(); // buffer for instruction nodes
     
     let mut op = instruction;
     let mut rd = 0;
@@ -15,6 +18,7 @@ pub fn parse_instruction(
     let mut imm_identifier = String::new();
     
     match op {
+        // instructions in the form "instr $rd, $ra, $rb"
         Instr::And | Instr::Or | Instr::Xor | Instr::Add | Instr::Sub | Instr::Cmp => {
             rd = get_register(lexer.next())?;
             sel_token(lexer.next(), Token::Comma)?;
@@ -22,11 +26,13 @@ pub fn parse_instruction(
             sel_token(lexer.next(), Token::Comma)?;
             rb = get_register(lexer.next())?;
         },
+        // instructions in the form "instr $rd, $ra"
         Instr::Not | Instr::J => {
             rd = get_register(lexer.next())?;
             sel_token(lexer.next(), Token::Comma)?;
             ra = get_register(lexer.next())?;
         },
+        // instructions in the form "instr $rd, $ra, immediate"
         Instr::Sl | Instr::Sr | Instr::Addi => {
             rd = get_register(lexer.next())?;
             sel_token(lexer.next(), Token::Comma)?;
@@ -34,7 +40,7 @@ pub fn parse_instruction(
             sel_token(lexer.next(), Token::Comma)?;
             imm = get_immediate(lexer.next())?;
         },
-
+        // instructions in the form "instr $ra, $rb, immediate/identifier"
         Instr::Beq | Instr::Bne => {
             ra = get_register(lexer.next())?;
             sel_token(lexer.next(), Token::Comma)?;
@@ -42,18 +48,19 @@ pub fn parse_instruction(
             sel_token(lexer.next(), Token::Comma)?;
             (imm_identifier, imm) = get_identifier_or_imm(lexer.next())?;
         },
-
+        // instructions in the form "instr $rd, immediate"
         Instr::Lui => {
             rd = get_register(lexer.next())?;
             sel_token(lexer.next(), Token::Comma)?;
             imm = get_immediate(lexer.next())?;
         },
-
+        // instructions in the form "instr $rd, $rb"
         Instr::Lw => {
             rd = get_register(lexer.next())?;
             sel_token(lexer.next(), Token::Comma)?;
             rb = get_register(lexer.next())?;
         },
+        // instructions in the form "instr $ra, $rb"
         Instr::Sw => {
             ra = get_register(lexer.next())?;
             sel_token(lexer.next(), Token::Comma)?;
@@ -83,7 +90,7 @@ pub fn parse_instruction(
             identifier = String::new();
         },
 
-        Instr::Ja => {
+        Instr::Ja => { // ja consists of three instructions
             rd = get_register(lexer.next())?;
             sel_token(lexer.next(), Token::Comma)?;
             (imm_identifier, imm) = get_identifier_or_imm(lexer.next())?;
@@ -127,7 +134,7 @@ pub fn parse_instruction(
             op, rd, ra, rb, imm, identifier, imm_identifier, address: *address
         }
     );
-    *address += 4;
+    *address += 4; // each instruction lies 4 bytes after the next
 
     Ok(return_vector)
 }

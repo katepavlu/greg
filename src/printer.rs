@@ -1,40 +1,33 @@
 use crate::ProgramTree;
 use crate::types::*;
 
-#[derive(Debug, PartialEq)]
-pub enum PrinterError{
-    PseudoinstructionNotHandled(Instr),
-    InvalidBlock(Bl),
-}
+/// receives an abstract program tree, handles converting it to binary form
+pub fn print_binary(tree: ProgramTree) -> ProgramBinary {
 
-impl std::fmt::Display for PrinterError{
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            Self::PseudoinstructionNotHandled(instr) => 
-                write!(f, "Pseudoinstruction not handled: {:?}. This is a parser bug", instr), 
-            Self::InvalidBlock(bl) => 
-                write!(f, "Invalid block: {:?}. This is a parser bug", bl),      
-        }
-    }
-}
-
-pub fn print_binary(tree: ProgramTree) -> Result<ProgramBinary, PrinterError> {
-
+    // create a new binary
     let mut binary = ProgramBinary{
         data: Vec::new(),
         instructions: Vec::new(),
     };
 
+    // convert data nodes
     for datanode in tree.data {
         match datanode.block{
+            // addr nodes work directly on addresses, usually memory mapped IO
+            // so they are ignored when generating memory files
             Bl::Addr => (),
+
+            // word nodes are directly placed in memory
             Bl::Word => binary.data.push(datanode.data as u32),
+
+            // each space node represents [num] words. Here they are initialized.
             Bl::Space => {
                 for _i in 0..datanode.num {
                     binary.data.push(0);
                 }
             }
-            b => return Err(PrinterError::InvalidBlock(b)),
+            b => panic!("Invalid block: {:?}. This is a parser bug", b),
+            //this should never happen if the program logic is correct
         }
     }
 
@@ -63,7 +56,8 @@ pub fn print_binary(tree: ProgramTree) -> Result<ProgramBinary, PrinterError> {
 
             Instr::Lw =>  0b1110,
             Instr::Sw =>  0b1111,
-            i => return Err(PrinterError::PseudoinstructionNotHandled(i)),
+            i => panic!("Pseudoinstruction not handled: {:?}. This is a parser bug", i),
+            //this should never happen if the program logic is correct
         }) << 28;
 
         instruction |= ((instrnode.rd as u32) & 0b1111) << 24; // add Rd
@@ -75,7 +69,7 @@ pub fn print_binary(tree: ProgramTree) -> Result<ProgramBinary, PrinterError> {
         binary.instructions.push(instruction);
     }
 
-    Ok(binary)
+    binary
 }
 
 #[cfg(test)]
@@ -125,7 +119,7 @@ mod tests{
             ]
         };
 
-        assert_eq!(print_binary(tree).unwrap(), bin);
+        assert_eq!(print_binary(tree), bin);
 
     }
 }

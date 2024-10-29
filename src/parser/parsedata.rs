@@ -1,6 +1,7 @@
-use super::parsehelpers::*;
+use super::parserhelpers::*;
 use super::*;
 
+/// given the block identifier of a data node, parse the rest of it and return the node
 pub fn parse_data(
     block: Bl, identifier: String, lexer:&mut Lexer<'_>, address: &mut u32 )
     -> Result<DataNode, ParserError> 
@@ -10,10 +11,13 @@ pub fn parse_data(
     let mut addr = *address;
 
     match block {
+        // form: .word immediate
         Bl::Word => {
             data = get_immediate(lexer.next())?;
             *address += 4;
         },
+        // form: .word immediate
+        // immediate is restricted to positive values, since it represents a number of words
         Bl::Space => {
             if let (loc,Token::Immediate(i) ) = read_token(lexer.next())? {
                 if i>=0 {
@@ -25,6 +29,8 @@ pub fn parse_data(
                 }
             };
         }
+        // form .word immediate
+        // immediate is restricted to positive values, since it represents a memory address
         Bl::Addr => {
             if let (loc,Token::Immediate(i) ) = read_token(lexer.next())? {
                 if i>=0 {

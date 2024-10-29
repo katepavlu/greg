@@ -2,14 +2,19 @@ use core::fmt;
 use lexgen_util::LexerError;
 use std::convert::Infallible;
 
+// helper functions for the parser
+mod parserhelpers;
+use parserhelpers::*;
 
-mod parsehelpers;
-use parsehelpers::*;
+// parser for one instruction node
 mod parseinstruction;
 use parseinstruction::*;
+
+// parser for one data node
 mod parsedata;
 use parsedata::*;
 
+// lexer for the pierogi assembler language
 pub mod mylexer;
 
 use crate::types::*;
@@ -27,7 +32,6 @@ pub struct Loc{
     pub col:u32
 }
 
-/// # Parse error type
 #[derive(Debug, PartialEq)]
 pub enum ParserError{
     CodeOutsideSegment(Loc),
@@ -52,6 +56,8 @@ impl std::fmt::Display for ParserError {
     }
 }
 
+/// parse a program listing, creating an abstract program tree
+/// with two branches (data and instructions).
 pub fn parse(input_buffer: &str) -> Result<ProgramTree, ParserError> {
     // create a program tree structure to output
     let mut tree = ProgramTree{
@@ -77,7 +83,8 @@ pub fn parse(input_buffer: &str) -> Result<ProgramTree, ParserError> {
     let mut data_address = DATA_ADDRESS_OFFSET;
     let mut instr_address = TEXT_ADDRESS_OFFSET;
     let mut identifier;
-    
+
+    // loop over the input until your reach an error or its end
     'outer: loop{
 
         let token = read_token(lexer.next());
@@ -104,12 +111,12 @@ pub fn parse(input_buffer: &str) -> Result<ProgramTree, ParserError> {
         match current_segment {
 
             Bl::Data => {
-                match token {
+                match token { 
                     Token::Block(Bl::Text) => current_segment = Bl::Text,
                     Token::Block(Bl::Data) => continue,
                     Token::Block(b) => {
+                        // if inside data segment: try to parse one data line
                         let node = parse_data(b, identifier, &mut lexer, &mut data_address)?;
-                        //println!("{:#?}", node);
                         tree.data.push(node);
                     },
                     _ => return Err(ParserError::Incomplete(loc)),                    
@@ -120,8 +127,8 @@ pub fn parse(input_buffer: &str) -> Result<ProgramTree, ParserError> {
                     Token::Block(Bl::Data) => current_segment = Bl::Data,
                     Token::Block(Bl::Text) => continue,
                     Token::Instruction(i) => {
+                        // if inside text segment: try to parse one instruction
                         let mut nodes = parse_instruction(i, identifier, &mut lexer, &mut instr_address)?;
-                        //println!("{:#?}", nodes);
                         tree.instructions.append(&mut nodes);
                     },
                     _ => return Err(ParserError::Incomplete(loc)),
