@@ -106,7 +106,7 @@ mod tests{
                 InstructionNode{
                     op: Instr::Addi,
                     rd: 1, ra: 0, rb: 0,
-                    imm:0, identifier: "beginning".to_string(),
+                    imm:0, identifier: "".to_string(),
                     imm_identifier: "number".to_string(), address: 4,
                 },
                 InstructionNode{
@@ -138,13 +138,13 @@ mod tests{
                 InstructionNode{
                     op: Instr::Addi,
                     rd: 1, ra: 0, rb: 0,
-                    imm:0x0004, identifier: "beginning".to_string(),
+                    imm:0x0004, identifier: "".to_string(),
                     imm_identifier: "number".to_string(), address: 4,
                 },
                 InstructionNode{
                     op: Instr::Beq, 
                     rd:0, ra: 1, rb: 0,
-                    imm:-4, identifier: "".to_string(),
+                    imm:-8, identifier: "".to_string(),
                     imm_identifier: "beginning".to_string(), address: 8,
                 },
             ],
