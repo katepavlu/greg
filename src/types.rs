@@ -1,8 +1,4 @@
-use std::collections::HashMap;
-
 /// # Token types
-/// 
-/// #TODO explain what Err does
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Token {
     Comma,
@@ -15,6 +11,7 @@ pub enum Token {
     Err,
 }
 
+/// # Block annotation types
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Bl {
     Data,
@@ -37,6 +34,7 @@ pub enum Instr {
     La, Ja,
 }
 
+/// # Abstract instruction representation
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct InstructionNode {
     pub op: Instr,
@@ -49,6 +47,7 @@ pub struct InstructionNode {
     pub address: u32,
 }
 
+/// # abstract data block representation
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct DataNode {
     pub identifier: String,
@@ -58,9 +57,9 @@ pub struct DataNode {
     pub num: u32,
 }
 
+/// # abstract representation of the whole program
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ProgramTree {
     pub instructions: Vec<InstructionNode>,
     pub data: Vec<DataNode>,
-    pub id_map: HashMap<String, u32>,
 }

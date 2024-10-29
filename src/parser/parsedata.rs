@@ -1,7 +1,7 @@
-use crate::parsehelpers::*;
+use super::parsehelpers::*;
 use super::*;
 
-fn parse_data(
+pub fn parse_data(
     block: Bl, mut identifier: String, lexer:&mut Lexer<'_>, address: &mut u32 )
     -> Result<DataNode, ParserError> 
 {

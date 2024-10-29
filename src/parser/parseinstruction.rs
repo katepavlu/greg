@@ -1,8 +1,8 @@
 use crate::mylexer;
-use crate::parsehelpers::*;
+use super::parsehelpers::*;
 use super::*;
 
-fn parse_instruction(
+pub fn parse_instruction(
     instruction: Instr, mut identifier: String, lexer:&mut Lexer<'_>, address: &mut u32 )
      -> Result<Vec<InstructionNode>, ParserError> 
 {
