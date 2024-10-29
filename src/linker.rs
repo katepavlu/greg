@@ -1,13 +1,13 @@
 use crate::ProgramTree;
-use std::{collections::HashMap, path::Display};
+use std::collections::HashMap;
 use crate::types::*;
 
 #[derive(Debug, PartialEq)]
-pub enum LinkError{
+pub enum LinkerError{
     UnknownIdentifier(String)
 }
 
-impl std::fmt::Display for LinkError{
+impl std::fmt::Display for LinkerError{
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::UnknownIdentifier(id) => write!(f, "Identifier not recognized: {id}"),      
@@ -16,7 +16,7 @@ impl std::fmt::Display for LinkError{
 }
 
 
-pub fn link(mut tree:ProgramTree) -> Result<ProgramTree, LinkError> {
+pub fn link(mut tree:ProgramTree) -> Result<ProgramTree, LinkerError> {
 
     let mut map = HashMap::new();
 
@@ -39,7 +39,7 @@ pub fn link(mut tree:ProgramTree) -> Result<ProgramTree, LinkError> {
             let target_address = 
             match map.get(&instrnode.imm_identifier) {
                 Some(n)=> n.to_owned(),
-                None => return Err(LinkError::UnknownIdentifier(instrnode.imm_identifier.clone())),
+                None => return Err(LinkerError::UnknownIdentifier(instrnode.imm_identifier.clone())),
             };
     
             match instrnode.op {
@@ -136,6 +136,31 @@ mod tests{
         let tree_linked = link(tree_in);
 
         assert_eq!(tree_linked.unwrap(),tree_out);
+    }
+
+
+    #[test]
+    fn linkerror() {
+        let tree = ProgramTree{
+            data: vec![
+                DataNode{
+                    identifier: "number1".to_string(),
+                    address: 0x1000_0004,
+                    block: Bl::Word,
+                    data: 5,
+                    num: 1,
+                }
+            ],
+            instructions: vec![
+                InstructionNode{
+                    op: Instr::Lui, 
+                    rd: 1, ra: 0, rb: 0,
+                    imm: 0x1000, identifier: "".to_string(),
+                    imm_identifier: "number2".to_string(), address: 0,
+                }],
+        };
+
+        assert_eq!(link(tree), Err(LinkerError::UnknownIdentifier("number2".to_string())))
     }
 
 }

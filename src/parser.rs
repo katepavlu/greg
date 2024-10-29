@@ -59,7 +59,7 @@ pub fn parse(input_buffer: &str) -> Result<ProgramTree, ParserError> {
         data: Vec::new(),
     };
 
-    let mut current_segment = Bl::Data;    
+    let mut current_segment;    
 
     // create a lexer iterator to recognize tokens in the input
     let mut lexer

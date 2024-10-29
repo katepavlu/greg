@@ -12,8 +12,4 @@ pub use parser::parse;
 
 pub mod linker;
 
-
-
-mod printer{
-
-}
+pub mod printer;

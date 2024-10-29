@@ -57,9 +57,16 @@ pub struct DataNode {
     pub num: u32,
 }
 
-/// # abstract representation of the whole program
+/// # Abstract representation of the whole program
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct ProgramTree {
     pub instructions: Vec<InstructionNode>,
     pub data: Vec<DataNode>,
+}
+
+/// # Compiled binary
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct ProgramBinary {
+    pub instructions: Vec<u32>,
+    pub data: Vec<u32>,
 }
