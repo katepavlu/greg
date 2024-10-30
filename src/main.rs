@@ -81,12 +81,13 @@ fn parse_args(args: Vec<String>) -> (Vec<String>, String, u32) {
 ///
 /// display usage hint and exit if wrong number of arguments was read
 fn usage_hint() -> ! {
-    println!("Usage:");
-    println!("greg [infile1] [infile2] ... -o [outfile] -p [physical memory .data offset]");
-    println!("Mandatory argument: infile2. Other arguments optional.");
-    println!("Arguments:");
-    println!("-o | output file name - defaults to \"a.hex\"");
-    println!("-p | offset of .data segment in physical memory - defaults to 0x400");
-    println!("Produces [outfile].data and [outfile].instr; outfile defaults to \"a\"");
+    println!("-------------------------- greg the compiler - v2.0.0 -------------------------");
+    println!("| Usage:                                                                      |");
+    println!("| greg [infile1] [infile2] ... -o [outfile] -p [physical memory .data offset] |");
+    println!("| Mandatory argument: infile2. Other arguments optional.                      |");
+    println!("| Arguments:                                                                  |");
+    println!("| -o | output file name - defaults to \"a.hex\"                                 |");
+    println!("| -p | offset of .data segment in physical memory - defaults to 0x400         |");
+    println!("-------------------------------------------------------------------------------");
     exit(1);
 }
