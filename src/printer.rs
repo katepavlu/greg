@@ -184,7 +184,7 @@ mod tests {
             instructions: vec![0xD100_1000, 0xC150_0004, 0x8016_FFFC],
         };
 
-        let hex ="\r\n:04000000D10010001B\r\n:04000400C1500004E3\r\n:040008008016FFFC63\r\n:0404000000000005F3\r\n";
+        let hex ="\r\n:04000000D10010001B\r\n:04000100C1500004E6\r\n:040002008016FFFC69\r\n:0404000000000005F3\r\n";
 
         assert_eq!(print_hex(bin, 0x400), hex);
     }
