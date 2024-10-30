@@ -1,4 +1,5 @@
 /target
 *.instr
 *.data
+*.hex
 .vscode/

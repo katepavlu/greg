@@ -44,7 +44,7 @@ impl std::fmt::Display for AssemblerError {
 /// # Panics:
 ///
 /// Should only panic if there is a bug.
-pub fn assemble(listing: &str) -> Result<ProgramBinary, AssemblerError> {
+pub fn assemble(listing: &str, offset: u32) -> Result<String, AssemblerError> {
     let mut tree = match parser::parse(listing) {
         Ok(tree) => tree,
         Err(e) => return Err(AssemblerError::ParserError(e)),
@@ -57,7 +57,9 @@ pub fn assemble(listing: &str) -> Result<ProgramBinary, AssemblerError> {
 
     let binary = printer::print_binary(tree);
 
-    Ok(binary)
+    let hex = printer::print_hex(binary, offset);
+
+    Ok(hex)
 }
 
 #[cfg(test)]
@@ -111,25 +113,28 @@ mod tests {
             ],
         };
 
-        assert_eq!(assemble(text).unwrap(), binary);
+        assert_eq!(
+            assemble(text, 0x400).unwrap(),
+            printer::print_hex(binary, 0x400)
+        );
     }
 
     #[test]
     fn integration_test_errors() {
         assert_eq!(
-            assemble(""),
+            assemble("", 0x400),
             Err(AssemblerError::ParserError(ParserError::Empty))
         );
 
         assert_eq!(
-            assemble("&"),
+            assemble("&", 0x400),
             Err(AssemblerError::ParserError(ParserError::InvalidToken(
                 Loc { row: 0, col: 0 }
             )))
         );
 
         assert_eq!(
-            assemble(".text\naddi $t1, 0"),
+            assemble(".text\naddi $t1, 0", 0x400),
             Err(AssemblerError::ParserError(ParserError::Incomplete(Loc {
                 row: 1,
                 col: 10
@@ -137,14 +142,14 @@ mod tests {
         );
 
         assert_eq!(
-            assemble(".text\nla $t1, id"),
+            assemble(".text\nla $t1, id", 0x400),
             Err(AssemblerError::LinkerError(LinkerError::UnknownIdentifier(
                 "id".to_string()
             )))
         );
 
         assert_eq!(
-            assemble("la $t1, id"),
+            assemble("la $t1, id", 0x400),
             Err(AssemblerError::ParserError(
                 ParserError::CodeOutsideSegment(Loc { row: 0, col: 0 })
             ))

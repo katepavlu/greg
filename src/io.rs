@@ -1,7 +1,7 @@
 use std::{fs::File, io::prelude::*, path::Path, process};
 
 /// Print a binary (u32) buffer to a file specified in filename
-pub fn print_to_file(filename: &str, buffer: Vec<u32>) {
+pub fn print_to_file(filename: &str, buffer: String) {
     // create a file for the output (data)
     let file_path = Path::new(&filename);
 
@@ -11,12 +11,10 @@ pub fn print_to_file(filename: &str, buffer: Vec<u32>) {
     };
 
     // save all the gatherred data to it
-    for num in buffer {
-        match file_handle.write_all(&num.to_be_bytes()) {
-            Ok(_) => (),
-            Err(_) => file_cleanup(file_path),
-        }
-    }
+    match file_handle.write_all(buffer.as_bytes()) {
+        Ok(_) => (),
+        Err(_) => file_cleanup(file_path),
+    };
 
     // flush
     match file_handle.flush() {

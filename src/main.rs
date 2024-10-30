@@ -7,7 +7,7 @@ use std::process::exit;
 fn main() {
     // argument handling
     let args: Vec<String> = env::args().collect(); //take in two filenames (input, output)
-    let (input_files, output_file) = parse_args(args);
+    let (input_files, output_file, offset) = parse_args(args);
 
     let mut program_listing = String::new();
 
@@ -22,20 +22,20 @@ fn main() {
     }
 
     // assemble file, panicking on errors
-    let binary = match assemble(&program_listing) {
-        Ok(bin) => bin,
+    let hex = match assemble(&program_listing, offset) {
+        Ok(hex) => hex,
         Err(e) => panic!("{}", e),
     };
 
     // print out assembled binary
-    io::print_to_file(&(output_file.clone() + ".data"), binary.data);
-    io::print_to_file(&(output_file.clone() + ".instr"), binary.instructions);
+    io::print_to_file(&output_file, hex);
 }
 
 /// parse arguments given to the fucntion, exit with usage hint if something is not right
-fn parse_args(args: Vec<String>) -> (Vec<String>, String) {
+fn parse_args(args: Vec<String>) -> (Vec<String>, String, u32) {
     let mut infiles: Vec<String> = Vec::new();
-    let mut outfile = "a".to_string(); //output file defaults to "a"
+    let mut outfile = "a.hex".to_string(); //output file defaults to "a"
+    let mut offset = 0x400;
 
     let mut args = args.iter();
 
@@ -51,7 +51,6 @@ fn parse_args(args: Vec<String>) -> (Vec<String>, String) {
     // loop over the rest of the arguments
     // break out o the loop once arguments run out
     while let Some(arg) = args.next() {
-
         match &arg[..] {
             // if -o option is invoked, capture outfile name and break out of the loop
             "-o" => {
@@ -59,14 +58,23 @@ fn parse_args(args: Vec<String>) -> (Vec<String>, String) {
                     Some(str) => str.to_owned(),
                     None => usage_hint(),
                 };
-                break;
+            }
+            "-p" => {
+                let temp = match args.next() {
+                    Some(str) => str.to_owned(),
+                    None => usage_hint(),
+                };
+                offset = match temp.parse::<u32>() {
+                    Ok(str) => str.to_owned(),
+                    Err(_) => usage_hint(),
+                };
             }
             // otherwise keep rading input files
             _ => infiles.push(arg.to_owned()),
         }
     }
 
-    (infiles, outfile)
+    (infiles, outfile, offset)
 }
 
 /// # Usage hint
@@ -74,8 +82,11 @@ fn parse_args(args: Vec<String>) -> (Vec<String>, String) {
 /// display usage hint and exit if wrong number of arguments was read
 fn usage_hint() -> ! {
     println!("Usage:");
-    println!("greg [infile1] [infile2] ... -o [outfile]");
+    println!("greg [infile1] [infile2] ... -o [outfile] -p [physical memory .data offset]");
     println!("Mandatory argument: infile2. Other arguments optional.");
+    println!("Arguments:");
+    println!("-o | output file name - defaults to \"a.hex\"");
+    println!("-p | offset of .data segment in physical memory - defaults to 0x400");
     println!("Produces [outfile].data and [outfile].instr; outfile defaults to \"a\"");
     exit(1);
 }
