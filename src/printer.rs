@@ -77,7 +77,6 @@ pub fn print_binary(tree: ProgramTree) -> ProgramBinary {
 // convert the binary to intel HEX format for uploading to hardware
 pub fn print_hex(binary: ProgramBinary, offset: u32) -> String {
     let mut hex = String::new();
-    hex.push_str("\r\n");
 
     let mut addr = 0;
 
@@ -91,6 +90,8 @@ pub fn print_hex(binary: ProgramBinary, offset: u32) -> String {
         hex.push_str(&print_hex_line(addr, word));
         addr += 1;
     }
+
+    hex.push_str(":00000001FF\n");
 
     hex
 }
@@ -109,7 +110,7 @@ fn print_hex_line(addr: u32, data: u32) -> String {
     checksum = !checksum + 1;
     checksum &= 0xff;
 
-    format!(":04{:04X}00{:08X}{:02X}\r\n", addr, data, checksum)
+    format!(":04{:04X}00{:08X}{:02X}\n", addr, data, checksum)
 }
 
 #[cfg(test)]
@@ -170,10 +171,10 @@ mod tests {
 
     #[test]
     fn hex_line_test() {
-        assert_eq!(print_hex_line(4, 0xdeadbeef), *":04000400DEADBEEFC0\r\n");
+        assert_eq!(print_hex_line(4, 0xdeadbeef), *":04000400DEADBEEFC0\n");
         assert_eq!(
             print_hex_line(0x1234, 0x12345678),
-            *":0412340012345678A2\r\n"
+            *":0412340012345678A2\n"
         );
     }
 
@@ -184,7 +185,7 @@ mod tests {
             instructions: vec![0xD100_1000, 0xC150_0004, 0x8016_FFFC],
         };
 
-        let hex ="\r\n:04000000D10010001B\r\n:04000100C1500004E6\r\n:040002008016FFFC69\r\n:0404000000000005F3\r\n";
+        let hex =":04000000D10010001B\n:04000100C1500004E6\n:040002008016FFFC69\n:0404000000000005F3\n:00000001FF\n";
 
         assert_eq!(print_hex(bin, 0x400), hex);
     }
