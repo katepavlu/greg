@@ -24,14 +24,25 @@ pub enum Bl {
 /// # Instructions
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Instr {
-    And, Or, Xor, Not,
-    Add, Sub, Cmp,
-    J, Beq, Bne,
-    Sl, Sr,
-    Addi, Lui,
-    Lw, Sw,
+    And,
+    Or,
+    Xor,
+    Not,
+    Add,
+    Sub,
+    Cmp,
+    J,
+    Beq,
+    Bne,
+    Sl,
+    Sr,
+    Addi,
+    Lui,
+    Lw,
+    Sw,
 
-    La, Ja,
+    La,
+    Ja,
 }
 
 /// # Abstract instruction representation

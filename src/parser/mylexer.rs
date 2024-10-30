@@ -1,9 +1,5 @@
+use crate::{Bl, Instr, Token};
 use lexgen::lexer;
-use crate::{
-    Token,
-    Bl,
-    Instr
-};
 
 lexer! {
     pub Lexer -> Token;
@@ -20,7 +16,7 @@ lexer! {
         '#' => |lexer| lexer.switch(LexerRule::Comment), // hash starts a comment
 
         // match instruction names if not followed by an alphanumeric characater
-        "and" > ((_ # $alphanumeric)|$) = Token::Instruction(Instr::And), 
+        "and" > ((_ # $alphanumeric)|$) = Token::Instruction(Instr::And),
         "or"  > ((_ # $alphanumeric)|$) = Token::Instruction(Instr::Or),
         "xor" > ((_ # $alphanumeric)|$) = Token::Instruction(Instr::Xor),
         "not" > ((_ # $alphanumeric)|$) = Token::Instruction(Instr::Not),
@@ -128,10 +124,13 @@ mod tests {
         assert_eq!(get_value(lexer.next()), Token::Colon);
         assert_eq!(get_value(lexer.next()), Token::Instruction(Instr::Add));
         assert_eq!(get_value(lexer.next()), Token::Register(0));
-        assert_eq!(get_value(lexer.next()), Token::Identifier("loop_start".to_string()));
+        assert_eq!(
+            get_value(lexer.next()),
+            Token::Identifier("loop_start".to_string())
+        );
         assert_eq!(get_value(lexer.next()), Token::Immediate(1600));
         assert_eq!(get_value(lexer.next()), Token::Block(Bl::Word));
-        assert_eq!(lexer.next() , None);
+        assert_eq!(lexer.next(), None);
     }
 
     // test each instruction type
@@ -158,7 +157,7 @@ mod tests {
         assert_eq!(get_value(lexer.next()), Token::Instruction(Instr::Sw));
         assert_eq!(get_value(lexer.next()), Token::Instruction(Instr::La));
         assert_eq!(get_value(lexer.next()), Token::Instruction(Instr::Ja));
-        assert_eq!(lexer.next() , None);
+        assert_eq!(lexer.next(), None);
     }
 
     // test each register
@@ -166,46 +165,38 @@ mod tests {
     fn registers() {
         let input1 = "$0 $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 $11 $12 $13 $14 $15";
         let input2 = "$zero $at $v $a0 $a1 $a2 $s0 $s1 $s2 $t0 $t1 $t2 $t3 $gv $ra $sp";
-        let output:Vec<u8> = (0..=15).collect();
+        let output: Vec<u8> = (0..=15).collect();
 
-
-        let vec1:Vec<u8> = Lexer::new(input1)
-            .map(|res| {
-                match res {
-                    Ok((_,Token::Register(i), _)) => i,
-                    _ => 255,
-                }
+        let vec1: Vec<u8> = Lexer::new(input1)
+            .map(|res| match res {
+                Ok((_, Token::Register(i), _)) => i,
+                _ => 255,
             })
             .collect();
 
-        let vec2:Vec<u8> = Lexer::new(input2)
-            .map(|res| {
-                match res {
-                    Ok((_,Token::Register(i), _)) => i,
-                    _ => 255,
-                }
+        let vec2: Vec<u8> = Lexer::new(input2)
+            .map(|res| match res {
+                Ok((_, Token::Register(i), _)) => i,
+                _ => 255,
             })
             .collect();
 
         assert_eq!(vec1, vec2);
         assert_eq!(vec1, output);
-       
     }
 
     // test supported immediate types: signed decimal, unsigned hex
     #[test]
     fn immediate() {
         let input = "0 +0 -0 010 +010 -010 0xdeadbeef 0x7fffffffffffffff";
-        let ovec:Vec<i64> = vec![0,0,0,10,10,-10, 0xdeadbeef, 0x7fffffffffffffff];
+        let ovec: Vec<i64> = vec![0, 0, 0, 10, 10, -10, 0xdeadbeef, 0x7fffffffffffffff];
 
-        let ivec:Vec<i64> = Lexer::new(input)
-        .map(|res| {
-            match res {
-                Ok((_,Token::Immediate(i), _)) => i,
+        let ivec: Vec<i64> = Lexer::new(input)
+            .map(|res| match res {
+                Ok((_, Token::Immediate(i), _)) => i,
                 _ => 255,
-            }
-        })
-        .collect();
+            })
+            .collect();
         assert_eq!(ovec, ivec);
     }
 
@@ -220,33 +211,38 @@ mod tests {
         assert_eq!(get_value(lexer.next()), Token::Block(Bl::Addr));
         assert_eq!(get_value(lexer.next()), Token::Block(Bl::Space));
         assert_eq!(get_value(lexer.next()), Token::Block(Bl::Word));
-        assert_eq!(lexer.next() , None);
+        assert_eq!(lexer.next(), None);
     }
 
     // test comments
     #[test]
     fn comments() {
-        let input = 
-        "#addi $t0, $zero, -256\n
+        let input = "#addi $t0, $zero, -256\n
          addi #$t0, $zero, -256\n
          #string\n
          #123465";
         let mut lexer = Lexer::new(input);
         assert_eq!(get_value(lexer.next()), Token::Instruction(Instr::Addi));
-        assert_eq!(lexer.next() , None);
+        assert_eq!(lexer.next(), None);
     }
 
     // test malformed tokens
     #[test]
     fn garbled() {
-        let malformed_strings = ["&t0", "+ěš", "$t4", "$one", ".home", "[", "𝝀", ".data1", "$t255"];
+        let malformed_strings = [
+            "&t0", "+ěš", "$t4", "$one", ".home", "[", "𝝀", ".data1", "$t255",
+        ];
 
         for string in malformed_strings {
             let l = Lexer::new(string).next().unwrap();
-            if let 
-            Err(LexerError{location:_, kind: LexerErrorKind::InvalidToken}) 
-                =  l
-            {} else {panic!("String {string} not recognized as invalid. {:#?}",l);}
+            if let Err(LexerError {
+                location: _,
+                kind: LexerErrorKind::InvalidToken,
+            }) = l
+            {
+            } else {
+                panic!("String {string} not recognized as invalid. {:#?}", l);
+            }
         }
     }
 
@@ -255,12 +251,26 @@ mod tests {
         let input = "add1 addiu janky snake_case CamelCase";
         let mut lexer = Lexer::new(input);
 
-        assert_eq!(get_value(lexer.next()), Token::Identifier("add1".to_string()));
-        assert_eq!(get_value(lexer.next()), Token::Identifier("addiu".to_string()));
-        assert_eq!(get_value(lexer.next()), Token::Identifier("janky".to_string()));
-        assert_eq!(get_value(lexer.next()), Token::Identifier("snake_case".to_string()));
-        assert_eq!(get_value(lexer.next()), Token::Identifier("CamelCase".to_string()));
+        assert_eq!(
+            get_value(lexer.next()),
+            Token::Identifier("add1".to_string())
+        );
+        assert_eq!(
+            get_value(lexer.next()),
+            Token::Identifier("addiu".to_string())
+        );
+        assert_eq!(
+            get_value(lexer.next()),
+            Token::Identifier("janky".to_string())
+        );
+        assert_eq!(
+            get_value(lexer.next()),
+            Token::Identifier("snake_case".to_string())
+        );
+        assert_eq!(
+            get_value(lexer.next()),
+            Token::Identifier("CamelCase".to_string())
+        );
         assert_eq!(lexer.next(), None);
     }
-
 }

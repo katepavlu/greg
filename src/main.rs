@@ -5,7 +5,6 @@ use std::process::exit;
 
 /// # Greg the assembler
 fn main() {
-
     // argument handling
     let args: Vec<String> = env::args().collect(); //take in two filenames (input, output)
     let (input_files, output_file) = parse_args(args);
@@ -13,8 +12,7 @@ fn main() {
     let mut program_listing = String::new();
 
     for file in input_files {
-        let file_contents = 
-        match fs::read_to_string(file) {
+        let file_contents = match fs::read_to_string(file) {
             Err(e) => panic!("Error reading input: {e}"),
             Ok(str) => str,
         };
@@ -24,7 +22,7 @@ fn main() {
     }
 
     // assemble file, panicking on errors
-    let binary = match assemble(&program_listing) { 
+    let binary = match assemble(&program_listing) {
         Ok(bin) => bin,
         Err(e) => panic!("{}", e),
     };
@@ -32,9 +30,7 @@ fn main() {
     // print out assembled binary
     io::print_to_file(&(output_file.clone() + ".data"), binary.data);
     io::print_to_file(&(output_file.clone() + ".instr"), binary.instructions);
-    
 }
-
 
 /// parse arguments given to the fucntion, exit with usage hint if something is not right
 fn parse_args(args: Vec<String>) -> (Vec<String>, String) {
@@ -53,14 +49,8 @@ fn parse_args(args: Vec<String>) -> (Vec<String>, String) {
     infiles.push(arg.to_owned());
 
     // loop over the rest of the arguments
-    loop{
-
-        // break out o the loop once arguments run out
-        let arg = match args.next() {
-            Some(str) => str,
-            None => break,
-        };
-
+    // break out o the loop once arguments run out
+    while let Some(arg) = args.next() {
 
         match &arg[..] {
             // if -o option is invoked, capture outfile name and break out of the loop
@@ -69,11 +59,10 @@ fn parse_args(args: Vec<String>) -> (Vec<String>, String) {
                     Some(str) => str.to_owned(),
                     None => usage_hint(),
                 };
-                break
+                break;
             }
             // otherwise keep rading input files
             _ => infiles.push(arg.to_owned()),
-
         }
     }
 
@@ -81,9 +70,9 @@ fn parse_args(args: Vec<String>) -> (Vec<String>, String) {
 }
 
 /// # Usage hint
-/// 
+///
 /// display usage hint and exit if wrong number of arguments was read
-fn usage_hint () -> ! {
+fn usage_hint() -> ! {
     println!("Usage:");
     println!("greg [infile1] [infile2] ... -o [outfile]");
     println!("Mandatory argument: infile2. Other arguments optional.");

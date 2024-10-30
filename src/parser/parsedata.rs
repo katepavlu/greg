@@ -3,11 +3,13 @@ use super::*;
 
 /// given the block identifier of a data node, parse the rest of it and return the node
 pub fn parse_data(
-    block: Bl, identifier: String, lexer:&mut Lexer<'_>, address: &mut u32 )
-    -> Result<DataNode, ParserError> 
-{
+    block: Bl,
+    identifier: String,
+    lexer: &mut Lexer<'_>,
+    address: &mut u32,
+) -> Result<DataNode, ParserError> {
     let mut data = 0;
-    let mut num:u32 = 1;
+    let mut num: u32 = 1;
     let mut addr = *address;
 
     match block {
@@ -15,16 +17,15 @@ pub fn parse_data(
         Bl::Word => {
             data = get_immediate(lexer.next())?;
             *address += 4;
-        },
+        }
         // form: .word immediate
         // immediate is restricted to positive values, since it represents a number of words
         Bl::Space => {
-            if let (loc,Token::Immediate(i) ) = read_token(lexer.next())? {
-                if i>=0 {
+            if let (loc, Token::Immediate(i)) = read_token(lexer.next())? {
+                if i >= 0 {
                     num = i as u32;
-                    *address += 4*num;
-                }
-                else {
+                    *address += 4 * num;
+                } else {
                     return Err(ParserError::NegativeSpace(loc));
                 }
             };
@@ -32,11 +33,10 @@ pub fn parse_data(
         // form .word immediate
         // immediate is restricted to positive values, since it represents a memory address
         Bl::Addr => {
-            if let (loc,Token::Immediate(i) ) = read_token(lexer.next())? {
-                if i>=0 {
+            if let (loc, Token::Immediate(i)) = read_token(lexer.next())? {
+                if i >= 0 {
                     addr = i as u32;
-                }
-                else {
+                } else {
                     return Err(ParserError::NegativeSpace(loc));
                 }
             };
@@ -47,13 +47,17 @@ pub fn parse_data(
         }
     }
 
-    Ok(DataNode{
-            identifier, address:addr, block, data, num,
+    Ok(DataNode {
+        identifier,
+        address: addr,
+        block,
+        data,
+        num,
     })
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
     use super::*;
 
     #[test]
@@ -64,7 +68,7 @@ mod tests{
 
         assert_eq!(
             parse_data(Bl::Word, "constant".to_string(), &mut lexer, &mut address).unwrap(),
-            DataNode{
+            DataNode {
                 identifier: "constant".to_string(),
                 address: 0,
                 block: Bl::Word,
@@ -78,7 +82,7 @@ mod tests{
 
         assert_eq!(
             parse_data(Bl::Space, "constant".to_string(), &mut lexer, &mut address).unwrap(),
-            DataNode{
+            DataNode {
                 identifier: "constant".to_string(),
                 address: 4,
                 block: Bl::Space,
@@ -87,7 +91,7 @@ mod tests{
             }
         );
 
-        assert_eq!(address, 4*13);
+        assert_eq!(address, 4 * 13);
 
         let input = "-12";
         let mut lexer = mylexer::Lexer::new(input);
@@ -103,7 +107,7 @@ mod tests{
 
         assert_eq!(
             parse_data(Bl::Addr, "io".to_string(), &mut lexer, &mut address).unwrap(),
-            DataNode{
+            DataNode {
                 identifier: "io".to_string(),
                 address: 0xffff0000,
                 block: Bl::Addr,

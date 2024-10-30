@@ -1,8 +1,8 @@
 /// static variable memory addresses start here
-pub const DATA_ADDRESS_OFFSET:u32 = 0x10000000;
+pub const DATA_ADDRESS_OFFSET: u32 = 0x10000000;
 
 /// instruction memory addresses start here
-pub const TEXT_ADDRESS_OFFSET:u32 = 0x00000000;
+pub const TEXT_ADDRESS_OFFSET: u32 = 0x00000000;
 
 /// handles printing out files
 pub mod io;
@@ -37,16 +37,15 @@ impl std::fmt::Display for AssemblerError {
 }
 
 /// main function of the library - takes in a program listing, outputs a binary
-/// 
+///
 /// The program listing should be all the files of the program concatenated together,
 /// starting with the main function.
-/// 
+///
 /// # Panics:
-/// 
+///
 /// Should only panic if there is a bug.
 pub fn assemble(listing: &str) -> Result<ProgramBinary, AssemblerError> {
-
-    let mut tree = match parser::parse(&listing) {
+    let mut tree = match parser::parse(listing) {
         Ok(tree) => tree,
         Err(e) => return Err(AssemblerError::ParserError(e)),
     };
@@ -63,8 +62,8 @@ pub fn assemble(listing: &str) -> Result<ProgramBinary, AssemblerError> {
 
 #[cfg(test)]
 mod tests {
-    use std::vec;
     use parser::Loc;
+    use std::vec;
 
     use crate::*;
 
@@ -91,11 +90,8 @@ mod tests {
     add $zero, $zero, $zero
     ja $s0, loop_start
         ";
-        let binary = ProgramBinary{
-            data: vec![
-                125,
-                0,0,0,0, 0,0,0,0,
-            ],
+        let binary = ProgramBinary {
+            data: vec![125, 0, 0, 0, 0, 0, 0, 0, 0],
             instructions: vec![
                 0xd100_ffff,
                 0xca10_0000,
@@ -103,35 +99,55 @@ mod tests {
                 0xcb10_0000,
                 0xd100_1000,
                 0xc710_0004,
-
                 0xc900_0007,
                 0x8090_0010,
                 0xc990_ffff,
                 0xf09a_0000,
                 0x8000_fff4,
-
                 0x4000_0000,
-
                 0xd100_0000,
                 0xc110_001c,
                 0x7610_0000,
             ],
         };
 
-        assert_eq!( assemble(text).unwrap(), binary);
-
+        assert_eq!(assemble(text).unwrap(), binary);
     }
 
     #[test]
     fn integration_test_errors() {
-        assert_eq!(assemble(""), Err(AssemblerError::ParserError(ParserError::Empty)));
+        assert_eq!(
+            assemble(""),
+            Err(AssemblerError::ParserError(ParserError::Empty))
+        );
 
-        assert_eq!(assemble("&"), Err(AssemblerError::ParserError(ParserError::InvalidToken(Loc{row:0, col:0}))));
-        
-        assert_eq!(assemble(".text\naddi $t1, 0"), Err(AssemblerError::ParserError(ParserError::Incomplete(Loc{row:1, col:10}))));
+        assert_eq!(
+            assemble("&"),
+            Err(AssemblerError::ParserError(ParserError::InvalidToken(
+                Loc { row: 0, col: 0 }
+            )))
+        );
 
-        assert_eq!(assemble(".text\nla $t1, id"), Err(AssemblerError::LinkerError(LinkerError::UnknownIdentifier("id".to_string()))));
+        assert_eq!(
+            assemble(".text\naddi $t1, 0"),
+            Err(AssemblerError::ParserError(ParserError::Incomplete(Loc {
+                row: 1,
+                col: 10
+            })))
+        );
 
-        assert_eq!(assemble("la $t1, id"), Err(AssemblerError::ParserError(ParserError::CodeOutsideSegment(Loc{row:0, col:0}))));
+        assert_eq!(
+            assemble(".text\nla $t1, id"),
+            Err(AssemblerError::LinkerError(LinkerError::UnknownIdentifier(
+                "id".to_string()
+            )))
+        );
+
+        assert_eq!(
+            assemble("la $t1, id"),
+            Err(AssemblerError::ParserError(
+                ParserError::CodeOutsideSegment(Loc { row: 0, col: 0 })
+            ))
+        );
     }
 }
