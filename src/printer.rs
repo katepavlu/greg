@@ -83,13 +83,13 @@ pub fn print_hex(binary: ProgramBinary, offset: u32) -> String {
 
     for word in binary.instructions {
         hex.push_str(&print_hex_line(addr, word));
-        addr += 4;
+        addr += 1;
     }
 
     addr = offset;
     for word in binary.data {
         hex.push_str(&print_hex_line(addr, word));
-        addr += 4;
+        addr += 1;
     }
 
     hex
