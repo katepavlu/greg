@@ -81,7 +81,7 @@ fn parse_args(args: Vec<String>) -> (Vec<String>, String, u32) {
 ///
 /// display usage hint and exit if wrong number of arguments was read
 fn usage_hint() -> ! {
-    println!("-------------------------- greg the compiler - v2.0.2 -------------------------");
+    println!("-------------------------- greg the compiler - v2.0.3 -------------------------");
     println!("| Usage:                                                                      |");
     println!("| greg [infile1] [infile2] ... -o [outfile] -p [physical memory .data offset] |");
     println!("| infile1: Main input file. Your main function should start here.             |");
