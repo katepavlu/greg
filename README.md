@@ -1,7 +1,8 @@
 # greg
 ### The quick and dirty assembler
 
-![GitHub Release](https://img.shields.io/github/v/release/katepavlu/greg?include_prereleases) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/katepavlu/greg/ci.yml)
+![GitHub Release](https://img.shields.io/github/v/release/katepavlu/greg?include_prereleases) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/katepavlu/greg/ci.yml) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/katepavlu/greg/static.yml?label=docs)
+
 
 This was created as part of a university module project, implementing a custom [processor](https://github.com/katepavlu/pierogi) with a custom architecture. 
 
