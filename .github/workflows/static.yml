@@ -1,39 +1,42 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy documentation to Pages
+name: Continuous Integration
 
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["master"]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+    branches:
+    - master
+  pull_request:
 
 jobs:
-
+  
+  
   doc:
     name: Documentation on Github Pages
     runs-on: ubuntu-22.04
-    
+
     steps:
-      - name: Checkout
-      - uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Get date for registry cache
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      - name: Cargo registry cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ steps.date.outputs.date }}
+          restore-keys: ${{ runner.os }}-cargo-registry-
+
+      - name: Rust toolchain
+        uses: dtolnay/rust-toolchain@nightly
+
       - name: Build Documentation
-        run: cargo doc --no-deps
+        env: 
+          RUSTDOCFLAGS: --cfg=docsrs
+        run: cargo doc --no-deps --features "test_all_features" -p smithay -p calloop:0.14 -p drm -p gbm -p input -p udev -p wayland-server -p wayland-backend -p wayland-protocols -p winit -p x11rb -p tracing
         
       - name: Setup index
         run: cp ./doc_index.html ./target/doc/index.html
