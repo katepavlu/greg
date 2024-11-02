@@ -1,7 +1,7 @@
 # greg
 ### The quick and dirty assembler
 
-[![GitHub Release](https://img.shields.io/github/v/release/katepavlu/greg?include_prereleases)](https://github.com/katepavlu/greg/releases) [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/katepavlu/greg/ci.yml)](https://github.com/katepavlu/greg/actions) [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/katepavlu/greg/static.yml)](https://katepavlu.github.io/greg/)
+[![GitHub Release](https://img.shields.io/github/v/release/katepavlu/greg?include_prereleases)](https://github.com/katepavlu/greg/releases) [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/katepavlu/greg/ci.yml)](https://github.com/katepavlu/greg/actions) [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/katepavlu/greg/static.yml?label=docs)](https://katepavlu.github.io/greg/)
 
 
 
