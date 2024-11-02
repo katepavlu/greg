@@ -81,10 +81,10 @@ fn parse_args(args: Vec<String>) -> (Vec<String>, String, u32) {
 ///
 /// display usage hint and exit if wrong number of arguments was read
 fn usage_hint() -> ! {
-    println!("-------------------------- greg the compiler - v2.1.0 -------------------------");
+    println!("-------------------------- greg the compiler - v3.0.0 -------------------------");
     println!("| Usage:                                                                      |");
     println!("| greg [infile1] [infile2] ... -o [outfile] -p [physical memory .data offset] |");
-    println!("| infile1: Main input file. Your main function should start here.             |");
+    println!("| infile1: First input file. Mandatory.                                       |");
     println!("| infile*: Additional input fils. Linked with main file during assembly.      |");
     println!("| Arguments:                                                                  |");
     println!("| -o | output file name - defaults to \"a.hex\"                                 |");

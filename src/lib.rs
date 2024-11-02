@@ -78,6 +78,8 @@ mod tests {
     display: .addr 0xffff0000
 
 .text
+
+main:
     la $t1, display
     la $t2, constant
     la $s1, buffer
@@ -101,6 +103,11 @@ mod tests {
             instructions: vec![
                 0xdd00_1000,
                 0xdf00_8000,
+
+                0xd100_0000,
+                0xc110_0014,
+                0x7e10_0000,
+
                 0xd100_ffff,
                 0xca10_0000,
                 0xd100_1000,
@@ -118,7 +125,7 @@ mod tests {
                 0xe90f_0000,
                 0xcff0_0004,
                 0xd100_0000,
-                0xc110_0024,
+                0xc110_0030,
                 0x7610_0000,
             ],
         };
@@ -152,7 +159,7 @@ mod tests {
         );
 
         assert_eq!(
-            assemble(".text\nla $t1, id", 0x400),
+            assemble(".text main:\nla $t1, id", 0x400),
             Err(AssemblerError::LinkerError(LinkerError::UnknownIdentifier(
                 "id".to_string()
             )))
@@ -164,5 +171,12 @@ mod tests {
                 ParserError::CodeOutsideSegment(Loc { row: 0, col: 0 })
             ))
         );
+
+        assert_eq!(
+            assemble(".text add $t0, $zero, $zero", 0x400),
+            Err(AssemblerError::LinkerError(
+                LinkerError::UnknownIdentifier("main".to_string())
+            ))
+        )
     }
 }
