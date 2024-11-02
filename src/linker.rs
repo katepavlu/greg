@@ -11,8 +11,8 @@ pub enum LinkerError {
 impl std::fmt::Display for LinkerError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::UnknownIdentifier( id) if *id == *"main" => write!(f, "Main function not found"),
-            Self::UnknownIdentifier( id) => write!(f, "Identifier not recognized: \"{id}\""),
+            Self::UnknownIdentifier(id) if *id == *"main" => write!(f, "Main function not found"),
+            Self::UnknownIdentifier(id) => write!(f, "Identifier not recognized: \"{id}\""),
             Self::RedefinedIdentifier(id) => {
                 write!(f, "Identifier defined more than once: \"{id}\"")
             }

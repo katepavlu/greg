@@ -170,7 +170,7 @@ pub fn parse_instruction(
             *address += 4;
 
             op = Instr::Addi;
-            rd = 15;           
+            rd = 15;
             ra = 15;
             imm = 4;
             identifier = String::new();
@@ -391,8 +391,6 @@ mod tests {
                 }
             ]
         );
-
-
 
         let input = "$t0";
         let mut address = 0;

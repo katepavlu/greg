@@ -172,10 +172,7 @@ mod tests {
     #[test]
     fn hex_line_test() {
         assert_eq!(print_hex_line(4, 0xdeadbeef), *":04000400DEADBEEFC0\n");
-        assert_eq!(
-            print_hex_line(0x1234, 0x12345678),
-            *":0412340012345678A2\n"
-        );
+        assert_eq!(print_hex_line(0x1234, 0x12345678), *":0412340012345678A2\n");
     }
 
     #[test]

@@ -103,11 +103,9 @@ main:
             instructions: vec![
                 0xdd00_1000,
                 0xdf00_8000,
-
                 0xd100_0000,
                 0xc110_0014,
                 0x7e10_0000,
-
                 0xd100_ffff,
                 0xca10_0000,
                 0xd100_1000,
@@ -174,9 +172,9 @@ main:
 
         assert_eq!(
             assemble(".text add $t0, $zero, $zero", 0x400),
-            Err(AssemblerError::LinkerError(
-                LinkerError::UnknownIdentifier("main".to_string())
-            ))
+            Err(AssemblerError::LinkerError(LinkerError::UnknownIdentifier(
+                "main".to_string()
+            )))
         )
     }
 }
