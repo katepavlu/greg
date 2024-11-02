@@ -43,6 +43,8 @@ pub enum Instr {
 
     La,
     Ja,
+    Push,
+    Pop,
 }
 
 /// # Abstract instruction representation

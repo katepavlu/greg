@@ -71,7 +71,28 @@ impl std::fmt::Display for ParserError {
 pub fn parse(input_buffer: &str) -> Result<ProgramTree, ParserError> {
     // create a program tree structure to output
     let mut tree = ProgramTree {
-        instructions: Vec::new(),
+        instructions: vec![
+            InstructionNode{
+                op: Instr::Lui,
+                rd: 13,
+                ra: 0,
+                rb: 0,
+                imm: 0x1000,
+                identifier: "".to_string(),
+                imm_identifier: "".to_string(),
+                address: TEXT_ADDRESS_OFFSET
+            },
+            InstructionNode{
+                op: Instr::Lui,
+                rd: 15,
+                ra: 0,
+                rb: 0,
+                imm: 0x8000,
+                identifier: "".to_string(),
+                imm_identifier: "".to_string(),
+                address: TEXT_ADDRESS_OFFSET + 4
+            }
+        ],
         data: Vec::new(),
     };
 
@@ -103,7 +124,8 @@ pub fn parse(input_buffer: &str) -> Result<ProgramTree, ParserError> {
     };
 
     let mut data_address = DATA_ADDRESS_OFFSET;
-    let mut instr_address = TEXT_ADDRESS_OFFSET;
+    // first two instructions initialize the stack and global pointers
+    let mut instr_address = TEXT_ADDRESS_OFFSET + 8; 
     let mut identifier;
 
     // loop over the input until your reach an error or its end
@@ -198,6 +220,26 @@ mod tests {
                 ],
                 instructions: vec![
                     InstructionNode {
+                        op: Instr::Lui,
+                        rd: 13,
+                        ra: 0,
+                        rb: 0,
+                        imm: 0x1000,
+                        identifier: "".to_string(),
+                        imm_identifier: "".to_string(),
+                        address: TEXT_ADDRESS_OFFSET
+                    },
+                    InstructionNode {
+                        op: Instr::Lui,
+                        rd: 15,
+                        ra: 0,
+                        rb: 0,
+                        imm: 0x8000,
+                        identifier: "".to_string(),
+                        imm_identifier: "".to_string(),
+                        address: TEXT_ADDRESS_OFFSET + 4,
+                    },
+                    InstructionNode {
                         op: Instr::Add,
                         rd: 1,
                         ra: 0,
@@ -205,7 +247,7 @@ mod tests {
                         imm: 0,
                         identifier: "beginning".to_string(),
                         imm_identifier: "".to_string(),
-                        address: TEXT_ADDRESS_OFFSET,
+                        address: TEXT_ADDRESS_OFFSET + 8,
                     },
                     InstructionNode {
                         op: Instr::Beq,
@@ -215,7 +257,7 @@ mod tests {
                         imm: 0,
                         identifier: "".to_string(),
                         imm_identifier: "beginning".to_string(),
-                        address: TEXT_ADDRESS_OFFSET + 4,
+                        address: TEXT_ADDRESS_OFFSET + 12,
                     },
                 ],
             }

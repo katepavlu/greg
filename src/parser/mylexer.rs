@@ -35,6 +35,8 @@ lexer! {
 
         "la"  > ((_ # $alphanumeric)|$) = Token::Instruction(Instr::La),
         "ja"  > ((_ # $alphanumeric)|$) = Token::Instruction(Instr::Ja),
+        "push"> ((_ # $alphanumeric)|$) = Token::Instruction(Instr::Push),
+        "pop">  ((_ # $alphanumeric)|$) = Token::Instruction(Instr::Pop),
 
         // grabbing an identifier
         let id_init = ['a'-'z' 'A'-'Z' '_'];

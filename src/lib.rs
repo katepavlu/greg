@@ -90,11 +90,17 @@ mod tests {
         beq $zero, $zero, loop_start
     loop_end:
     add $zero, $zero, $zero
+
+    push $t0
+    pop $t0
+
     ja $s0, loop_start
         ";
         let binary = ProgramBinary {
             data: vec![125, 0, 0, 0, 0, 0, 0, 0, 0],
             instructions: vec![
+                0xdd00_1000,
+                0xdf00_8000,
                 0xd100_ffff,
                 0xca10_0000,
                 0xd100_1000,
@@ -107,8 +113,12 @@ mod tests {
                 0xf09a_0000,
                 0x8000_fff4,
                 0x4000_0000,
+                0xcff0_fffc,
+                0xf09f_0000,
+                0xe90f_0000,
+                0xcff0_0004,
                 0xd100_0000,
-                0xc110_001c,
+                0xc110_0024,
                 0x7610_0000,
             ],
         };

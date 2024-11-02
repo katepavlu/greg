@@ -131,6 +131,50 @@ pub fn parse_instruction(
             imm = 0;
             imm_identifier = String::new();
         }
+
+        Instr::Push => {
+            // push consists of two instructions
+            return_vector.push(InstructionNode {
+                op: Instr::Addi,
+                rd: 15,
+                ra: 15,
+                rb: 0,
+                imm: -4,
+                identifier,
+                imm_identifier: String::new(),
+                address: *address,
+            });
+
+            *address += 4;
+
+            op = Instr::Sw;
+            ra = get_register(lexer.next())?;
+            rb = 15;
+            identifier = String::new();
+        }
+        Instr::Pop => {
+            // pop consists of two instructions
+            rd = get_register(lexer.next())?;
+
+            return_vector.push(InstructionNode {
+                op: Instr::Lw,
+                rd,
+                ra: 0,
+                rb: 15,
+                imm: 0,
+                identifier,
+                imm_identifier: String::new(),
+                address: *address,
+            });
+
+            *address += 4;
+
+            op = Instr::Addi;
+            rd = 15;           
+            ra = 15;
+            imm = 4;
+            identifier = String::new();
+        }
     };
 
     return_vector.push(InstructionNode {
@@ -345,6 +389,68 @@ mod tests {
                     imm_identifier: "".to_string(),
                     address: 8,
                 }
+            ]
+        );
+
+
+
+        let input = "$t0";
+        let mut address = 0;
+        let mut lexer = mylexer::Lexer::new(input);
+
+        assert_eq!(
+            parse_instruction(Instr::Push, "loop".to_string(), &mut lexer, &mut address).unwrap(),
+            vec![
+                InstructionNode {
+                    op: Instr::Addi,
+                    rd: 15,
+                    ra: 15,
+                    rb: 0,
+                    imm: -4,
+                    identifier: "loop".to_string(),
+                    imm_identifier: "".to_string(),
+                    address: 0,
+                },
+                InstructionNode {
+                    op: Instr::Sw,
+                    rd: 0,
+                    ra: 9,
+                    rb: 15,
+                    imm: 0,
+                    identifier: "".to_string(),
+                    imm_identifier: "".to_string(),
+                    address: 4,
+                },
+            ]
+        );
+
+        let input = "$t0";
+        let mut address = 0;
+        let mut lexer = mylexer::Lexer::new(input);
+
+        assert_eq!(
+            parse_instruction(Instr::Pop, "loop".to_string(), &mut lexer, &mut address).unwrap(),
+            vec![
+                InstructionNode {
+                    op: Instr::Lw,
+                    rd: 9,
+                    ra: 0,
+                    rb: 15,
+                    imm: 0,
+                    identifier: "loop".to_string(),
+                    imm_identifier: "".to_string(),
+                    address: 0,
+                },
+                InstructionNode {
+                    op: Instr::Addi,
+                    rd: 15,
+                    ra: 15,
+                    rb: 0,
+                    imm: 4,
+                    identifier: "".to_string(),
+                    imm_identifier: "".to_string(),
+                    address: 4,
+                },
             ]
         );
     }
