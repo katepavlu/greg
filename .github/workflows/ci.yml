@@ -22,26 +22,3 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
-
-
-  doc:
-    name: Documentation on Github Pages
-    runs-on: ubuntu-22.04
-    needs:
-      - build
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build Documentation
-        run: cargo doc --no-deps
-        
-      - name: Setup index
-        run: cp ./doc_index.html ./target/doc/index.html
-
-      - name: Deploy
-        if: ${{ github.event_name == 'push' }}
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/doc
-          force_orphan: true
