@@ -11,11 +11,19 @@ fn main() {
 
     let mut program_listing = String::new();
 
+    let mut input_file_sizes:Vec<(String, usize)> = Vec::new();
+
+
     for file in input_files {
-        let file_contents = match fs::read_to_string(file) {
+        let file_contents = match fs::read_to_string(&file) {
             Err(e) => panic!("Error reading input: {e}"),
             Ok(str) => str,
         };
+
+        // save the input file name and length
+        input_file_sizes.push(
+            (file, file_contents.lines().count())
+        );
 
         program_listing.push_str(&file_contents);
         program_listing.push('\n');
@@ -24,7 +32,30 @@ fn main() {
     // assemble file, panicking on errors
     let hex = match assemble(&program_listing, offset) {
         Ok(hex) => hex,
-        Err(e) => panic!("{}", e),
+        Err(e) => {
+            match &e {
+                AssemblerError::ParserError(ParserError::Incomplete(loc)) |
+                AssemblerError::ParserError(ParserError::InvalidToken(loc)) |
+                AssemblerError::ParserError(ParserError::NegativeSpace(loc)) |
+                AssemblerError::ParserError(ParserError::CodeOutsideSegment(loc)) => {
+                    let mut file = String::new();
+                    let mut row = loc.row;
+                    for (file0, lines) in input_file_sizes {
+                        file = file0;
+                        if row > (lines as u32) {
+                            row -= lines as u32;
+                        }
+                        else {
+                            break
+                        }
+                    }
+                    panic!("{}: file: {} line: {} column: {}", e, file, row+1, loc.col);
+
+                }
+
+                _ => panic!("{}", e)
+            }
+        }
     };
 
     // print out assembled binary

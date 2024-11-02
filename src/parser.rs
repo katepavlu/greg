@@ -44,24 +44,16 @@ pub enum ParserError {
 impl std::fmt::Display for ParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::CodeOutsideSegment(loc) => write!(
-                f,
-                "Code outside of segment annotation: line {} column {}",
-                loc.row, loc.col
-            ),
-            Self::InvalidToken(loc) => {
-                write!(f, "Invalid token: line {} column {}", loc.row, loc.col)
+            Self::CodeOutsideSegment(_loc) => write!(f, "Code outside of segment annotation"),
+            Self::InvalidToken(_loc) => {
+                write!(f, "Invalid token")
             }
-            Self::Incomplete(loc) => {
-                write!(f, "Invalid statement: line {} column {}", loc.row, loc.col)
+            Self::Incomplete(_loc) => {
+                write!(f, "Invalid statement")
             }
             Self::End => write!(f, "End of input reached prematurely"),
             Self::Empty => write!(f, "No valid tokens found"),
-            Self::NegativeSpace(loc) => write!(
-                f,
-                "Number cannot be negative: line {} column {}",
-                loc.row, loc.col
-            ),
+            Self::NegativeSpace(_loc) => write!(f, "Number cannot be negative"),
         }
     }
 }
