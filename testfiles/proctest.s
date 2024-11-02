@@ -1,6 +1,7 @@
 .data
-    constant: .word 125
+    constant3: .word 125
 .text
+main:
     addi $1, $0, 1
     addi $2, $0, 2
     addi $3, $0, 3
