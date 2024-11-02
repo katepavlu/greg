@@ -9,7 +9,15 @@ fn main() {
     let args: Vec<String> = env::args().collect(); //take in two filenames (input, output)
     let (input_files, output_file, offset) = parse_args(args);
 
-    let mut program_listing = String::new();
+    // insert this before every program
+    let prelude = "\
+    .text
+    lui $gv, 0x1000
+    lui $sp, 0x8000
+    ja $ra, main
+    ";
+
+    let mut program_listing = String::from(prelude);
 
     let mut input_file_sizes: Vec<(String, usize)> = Vec::new();
 
@@ -35,7 +43,7 @@ fn main() {
             | AssemblerError::ParserError(ParserError::NegativeSpace(loc))
             | AssemblerError::ParserError(ParserError::CodeOutsideSegment(loc)) => {
                 let mut file = String::new();
-                let mut row = loc.row;
+                let mut row = loc.row - prelude.lines().count() as u32;
                 for (file0, lines) in input_file_sizes {
                     file = file0;
                     if row > (lines as u32) {
@@ -48,7 +56,7 @@ fn main() {
                     "{}: file: {} line: {} column: {}",
                     e,
                     file,
-                    row + 1,
+                    row + 2, // one line for counting from 1, one gets eaten by concatenation
                     loc.col
                 );
             }

@@ -78,6 +78,9 @@ mod tests {
     display: .addr 0xffff0000
 
 .text
+    lui $gv, 0x1000
+    lui $sp, 0x8000
+    ja $ra, main
 
 main:
     la $t1, display
@@ -169,12 +172,5 @@ main:
                 ParserError::CodeOutsideSegment(Loc { row: 0, col: 0 })
             ))
         );
-
-        assert_eq!(
-            assemble(".text add $t0, $zero, $zero", 0x400),
-            Err(AssemblerError::LinkerError(LinkerError::UnknownIdentifier(
-                "main".to_string()
-            )))
-        )
     }
 }
