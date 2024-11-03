@@ -5,7 +5,7 @@
 
 
 
-This was created as part of a university module project, implementing a custom [processor](https://github.com/katepavlu/pierogi) with a custom architecture. 
+This was created as part of a university module project, implementing a custom RISC [processor](https://github.com/katepavlu/pierogi). 
 
 Documention of the architecture and compiler capabilities can be found [here](https://docs.google.com/document/d/1AN-uqAFlSWyhOYCu5r69SF4dksxHxVPF_hEuQTsxCZg/edit?tab=t.0#heading=h.t90alc2soxi6])
 
