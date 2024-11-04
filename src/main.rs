@@ -123,7 +123,7 @@ fn usage_hint() -> ! {
     println!("| Usage:                                                                      |");
     println!("| greg [infile1] [infile2] ... -o [outfile] -p [physical memory .data offset] |");
     println!("| infile1: First input file. Mandatory.                                       |");
-    println!("| infile*: Additional input fils. Linked with main file during assembly.      |");
+    println!("| infile*: Additional input files. Linked with main file during assembly.     |");
     println!("| Arguments:                                                                  |");
     println!("| -o | output file name - defaults to \"a.hex\"                                 |");
     println!("| -p | offset of .data segment in physical memory - defaults to 0x400         |");
