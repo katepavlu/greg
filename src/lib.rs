@@ -36,7 +36,7 @@ impl std::fmt::Display for AssemblerError {
     }
 }
 
-/// main function of the library - takes in a program listing, outputs a binary
+/// main function of the library - takes in a program listing, outputs an Intel HEX binary
 ///
 /// The program listing should be all the files of the program concatenated together,
 /// starting with the main function.

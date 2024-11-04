@@ -74,7 +74,12 @@ pub fn print_binary(tree: ProgramTree) -> ProgramBinary {
     binary
 }
 
-// convert the binary to intel HEX format for uploading to hardware
+/// convert the binary to intel HEX format for uploading to hardware
+///
+/// this assumes two things:
+/// - the memory of the target is word addressable
+/// - the target has a virtual memory interface
+///   that remaps 0x1000_000 to the contents of offset
 pub fn print_hex(binary: ProgramBinary, offset: u32) -> String {
     let mut hex = String::new();
 
