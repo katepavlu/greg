@@ -84,8 +84,6 @@ mod tests {
 
 main:
     la $t1, display
-    la $t2, constant
-    la $s1, buffer
 
     addi $t0, $zero, 7 #initialize t0
     loop_start:
@@ -98,8 +96,6 @@ main:
 
     push $t0
     pop $t0
-
-    ja $s0, loop_start
         ";
         let binary = ProgramBinary {
             data: vec![125, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -107,14 +103,18 @@ main:
                 0xdd00_1000,
                 0xdf00_8000,
                 0xd100_0000,
-                0xc110_0014,
+                0xce00_0020,
+                0xaee0_0010,
+                0xbee0_0010,
+                0x411e_0000,
                 0x7e10_0000,
+
                 0xd100_ffff,
-                0xca10_0000,
-                0xd100_1000,
-                0xcb10_0000,
-                0xd100_1000,
-                0xc710_0004,
+                0xca00_0000,
+                0xaaa0_0010,
+                0xbaa0_0010,
+                0x4a1a_0000,
+
                 0xc900_0007,
                 0x8090_0010,
                 0xc990_ffff,
@@ -125,9 +125,6 @@ main:
                 0xf09f_0000,
                 0xe90f_0000,
                 0xcff0_0004,
-                0xd100_0000,
-                0xc110_0030,
-                0x7610_0000,
             ],
         };
 

@@ -70,31 +70,7 @@ pub fn parse_instruction(
         }
 
         Instr::La => {
-            // la is a pseudoinstruction that is composed of two others
-            rd = get_register(lexer.next())?;
-            sel_token(lexer.next(), Token::Comma)?;
-            (imm_identifier, imm) = get_identifier_or_imm(lexer.next())?;
-
-            return_vector.push(InstructionNode {
-                op: Instr::Lui,
-                rd: 1,
-                ra: 0,
-                rb: 0,
-                imm: imm >> 16,
-                identifier,
-                imm_identifier: imm_identifier.clone(),
-                address: *address,
-            });
-
-            *address += 4;
-            op = Instr::Addi;
-            ra = 1;
-            imm &= 0xffff;
-            identifier = String::new();
-        }
-
-        Instr::Ja => {
-            // ja consists of three instructions
+            // la is a pseudoinstruction that is composed of 5 others
             rd = get_register(lexer.next())?;
             sel_token(lexer.next(), Token::Comma)?;
             (imm_identifier, imm) = get_identifier_or_imm(lexer.next())?;
@@ -114,12 +90,118 @@ pub fn parse_instruction(
 
             return_vector.push(InstructionNode {
                 op: Instr::Addi,
-                rd: 1,
-                ra: 1,
+                rd,
+                ra: 0,
                 rb: 0,
                 imm: imm & 0xffff,
                 identifier: String::new(),
-                imm_identifier,
+                imm_identifier: imm_identifier.clone(),
+                address: *address,
+            });
+
+            *address += 4;
+
+            return_vector.push(InstructionNode {
+                op: Instr::Sl,
+                rd,
+                ra: rd,
+                rb: 0,
+                imm: 16,
+                identifier: String::new(),
+                imm_identifier: imm_identifier.clone(),
+                address: *address,
+            });
+
+            *address += 4;
+
+            return_vector.push(InstructionNode {
+                op: Instr::Sr,
+                rd,
+                ra: rd,
+                rb: 0,
+                imm: 16,
+                identifier: String::new(),
+                imm_identifier: imm_identifier.clone(),
+                address: *address,
+            });
+
+            *address += 4;
+
+
+
+            op = Instr::Add;
+            ra = 1;
+            rb = rd;
+            imm = 0;
+            identifier = String::new();
+        }
+
+        Instr::Ja => {
+            // ja consists of six instructions
+            rd = get_register(lexer.next())?;
+            sel_token(lexer.next(), Token::Comma)?;
+            (imm_identifier, imm) = get_identifier_or_imm(lexer.next())?;
+
+            return_vector.push(InstructionNode {
+                op: Instr::Lui,
+                rd: 1,
+                ra: 0,
+                rb: 0,
+                imm: imm >> 16,
+                identifier,
+                imm_identifier: imm_identifier.clone(),
+                address: *address,
+            });
+
+            *address += 4;
+
+            return_vector.push(InstructionNode {
+                op: Instr::Addi,
+                rd,
+                ra: 0,
+                rb: 0,
+                imm: imm & 0xffff,
+                identifier: String::new(),
+                imm_identifier: imm_identifier.clone(),
+                address: *address,
+            });
+
+            *address += 4;
+
+            return_vector.push(InstructionNode {
+                op: Instr::Sl,
+                rd,
+                ra: rd,
+                rb: 0,
+                imm: 16,
+                identifier: String::new(),
+                imm_identifier: imm_identifier.clone(),
+                address: *address,
+            });
+
+            *address += 4;
+
+            return_vector.push(InstructionNode {
+                op: Instr::Sr,
+                rd,
+                ra: rd,
+                rb: 0,
+                imm: 16,
+                identifier: String::new(),
+                imm_identifier: imm_identifier.clone(),
+                address: *address,
+            });
+
+            *address += 4;
+
+            return_vector.push(InstructionNode {
+                op: Instr::Add,
+                rd: 1,
+                ra: 1,
+                rb: rd,
+                imm: 0,
+                identifier: String::new(),
+                imm_identifier: imm_identifier.clone(),
                 address: *address,
             });
 
@@ -272,12 +354,42 @@ mod tests {
                 InstructionNode {
                     op: Instr::Addi,
                     rd: 8,
-                    ra: 1,
+                    ra: 0,
                     rb: 0,
                     imm: 0,
                     identifier: "".to_string(),
                     imm_identifier: "loop1".to_string(),
                     address: 4,
+                },
+                InstructionNode {
+                    op: Instr::Sl,
+                    rd: 8,
+                    ra: 8,
+                    rb: 0,
+                    imm: 16,
+                    identifier: "".to_string(),
+                    imm_identifier: "loop1".to_string(),
+                    address: 8,
+                },
+                InstructionNode {
+                    op: Instr::Sr,
+                    rd: 8,
+                    ra: 8,
+                    rb: 0,
+                    imm: 16,
+                    identifier: "".to_string(),
+                    imm_identifier: "loop1".to_string(),
+                    address: 12,
+                },
+                InstructionNode {
+                    op: Instr::Add,
+                    rd: 8,
+                    ra: 1,
+                    rb: 8,
+                    imm: 0,
+                    identifier: "".to_string(),
+                    imm_identifier: "loop1".to_string(),
+                    address: 16,
                 }
             ]
         );
@@ -302,12 +414,42 @@ mod tests {
                 InstructionNode {
                     op: Instr::Addi,
                     rd: 8,
-                    ra: 1,
+                    ra: 0,
                     rb: 0,
                     imm: 0x5678,
                     identifier: "".to_string(),
                     imm_identifier: "".to_string(),
                     address: 4,
+                },
+                InstructionNode {
+                    op: Instr::Sl,
+                    rd: 8,
+                    ra: 8,
+                    rb: 0,
+                    imm: 16,
+                    identifier: "".to_string(),
+                    imm_identifier: "".to_string(),
+                    address: 8,
+                },
+                InstructionNode {
+                    op: Instr::Sr,
+                    rd: 8,
+                    ra: 8,
+                    rb: 0,
+                    imm: 16,
+                    identifier: "".to_string(),
+                    imm_identifier: "".to_string(),
+                    address: 12,
+                },
+                InstructionNode {
+                    op: Instr::Add,
+                    rd: 8,
+                    ra: 1,
+                    rb: 8,
+                    imm: 0,
+                    identifier: "".to_string(),
+                    imm_identifier: "".to_string(),
+                    address: 16,
                 }
             ]
         );
@@ -331,13 +473,43 @@ mod tests {
                 },
                 InstructionNode {
                     op: Instr::Addi,
-                    rd: 1,
-                    ra: 1,
+                    rd: 8,
+                    ra: 0,
                     rb: 0,
                     imm: 0,
                     identifier: "".to_string(),
                     imm_identifier: "loop1".to_string(),
                     address: 4,
+                },
+                InstructionNode {
+                    op: Instr::Sl,
+                    rd: 8,
+                    ra: 8,
+                    rb: 0,
+                    imm: 16,
+                    identifier: "".to_string(),
+                    imm_identifier: "loop1".to_string(),
+                    address: 8,
+                },
+                InstructionNode {
+                    op: Instr::Sr,
+                    rd: 8,
+                    ra: 8,
+                    rb: 0,
+                    imm: 16,
+                    identifier: "".to_string(),
+                    imm_identifier: "loop1".to_string(),
+                    address: 12,
+                },
+                InstructionNode {
+                    op: Instr::Add,
+                    rd: 1,
+                    ra: 1,
+                    rb: 8,
+                    imm: 0,
+                    identifier: "".to_string(),
+                    imm_identifier: "loop1".to_string(),
+                    address: 16,
                 },
                 InstructionNode {
                     op: Instr::J,
@@ -347,7 +519,7 @@ mod tests {
                     imm: 0,
                     identifier: "".to_string(),
                     imm_identifier: "".to_string(),
-                    address: 8,
+                    address: 20,
                 }
             ]
         );
@@ -371,13 +543,43 @@ mod tests {
                 },
                 InstructionNode {
                     op: Instr::Addi,
-                    rd: 1,
-                    ra: 1,
+                    rd: 8,
+                    ra: 0,
                     rb: 0,
                     imm: 0x5678,
                     identifier: "".to_string(),
                     imm_identifier: "".to_string(),
                     address: 4,
+                },
+                InstructionNode {
+                    op: Instr::Sl,
+                    rd: 8,
+                    ra: 8,
+                    rb: 0,
+                    imm: 16,
+                    identifier: "".to_string(),
+                    imm_identifier: "".to_string(),
+                    address: 8,
+                },
+                InstructionNode {
+                    op: Instr::Sr,
+                    rd: 8,
+                    ra: 8,
+                    rb: 0,
+                    imm: 16,
+                    identifier: "".to_string(),
+                    imm_identifier: "".to_string(),
+                    address: 12,
+                },
+                InstructionNode {
+                    op: Instr::Add,
+                    rd: 1,
+                    ra: 1,
+                    rb: 8,
+                    imm: 0,
+                    identifier: "".to_string(),
+                    imm_identifier: "".to_string(),
+                    address: 16,
                 },
                 InstructionNode {
                     op: Instr::J,
@@ -387,7 +589,7 @@ mod tests {
                     imm: 0,
                     identifier: "".to_string(),
                     imm_identifier: "".to_string(),
-                    address: 8,
+                    address: 20,
                 }
             ]
         );
