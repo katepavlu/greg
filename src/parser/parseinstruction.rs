@@ -127,8 +127,6 @@ pub fn parse_instruction(
 
             *address += 4;
 
-
-
             op = Instr::Add;
             ra = 1;
             rb = rd;
