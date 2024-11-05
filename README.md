@@ -7,6 +7,6 @@
 
 This was created as part of a university module project, implementing a custom RISC [processor](https://github.com/katepavlu/pierogi). 
 
-Documention of the architecture and compiler capabilities can be found [here](https://docs.google.com/document/d/1AN-uqAFlSWyhOYCu5r69SF4dksxHxVPF_hEuQTsxCZg/edit?tab=t.0#heading=h.t90alc2soxi6])
+Documention of the architecture and compiler capabilities can be found [here](https://github.com/katepavlu/pierogi/blob/main/datasheet.pdf)
 
 API documentation is available [here](https://katepavlu.github.io/greg/)
