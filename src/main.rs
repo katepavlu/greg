@@ -12,6 +12,11 @@ fn main() {
     // insert this before every program
     let prelude = "\
     .text
+    and $zero, $zero, $zero
+    and $zero, $zero, $zero
+    and $zero, $zero, $zero
+    and $zero, $zero, $zero
+    and $zero, $zero, $zero
     lui $gv, 0x1000
     lui $sp, 0x8000
     ja $ra, main
